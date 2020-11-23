@@ -25,11 +25,7 @@ each seed 1 point, number of seeds: 7
   - Fill their hole.
   - Empty our opposite hole.
 
-
-
 - Max(Tree search + heuristic)
-
-
 
 #### Conditions
 
@@ -37,5 +33,16 @@ each seed 1 point, number of seeds: 7
 - We have empty holes
   - try to fill it
 - Opponent chosen some hole. They have empty holes (chosen that hole or eaten by us)
-  - 
+
+
+
+
+
+- alpha pruning
+- find some good heuristic (github & think & play)
+- read & learn about RL
+  - train a small model
+  - google colab
+
+
 
