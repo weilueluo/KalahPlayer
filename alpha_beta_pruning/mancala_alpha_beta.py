@@ -40,18 +40,18 @@ class Mancala_alpha_beta(Mancala):
         if side == "north":
             for i in range(self.n_holes):
                 if not self.is_empty_hole(i):
-                    move_list.append(i)
+                    move_list.append(i+1)
             return move_list
         else:
             for i in range(self.n_holes):
                 if not self.is_empty_hole(i + self.n_holes + 1):
-                    move_list.append(i)
+                    move_list.append(i+1)
             return move_list
 
 
     # There we don't take several steps in a row of the same player into account,
     # because the opponent will not let that happen.
-    def alpha_beta_pruning(mancala, side, alpha = -99, beta = 99, depth = 6):
+    def alpha_beta_pruning(mancala, side, alpha = -99, beta = 99, depth = 10):
         if depth == 0 or mancala.is_terminal_node():
             print("H: " + str(mancala.get_heuristics()))
             print(mancala)
@@ -63,9 +63,9 @@ class Mancala_alpha_beta(Mancala):
             print(mancala)
             print(mancala.get_all_possible_moves(side))
             for move in mancala.get_all_possible_moves(side):
-                print("S_move: " + str(move + 1))
-                print(Mancala_alpha_beta.step(mancala, side, move + 1))
-                _, value = Mancala_alpha_beta.alpha_beta_pruning(Mancala_alpha_beta.step(mancala, side, move + 1),\
+                print("S_move: " + str(move))
+                print(Mancala_alpha_beta.step(mancala, side, move))
+                _, value = Mancala_alpha_beta.alpha_beta_pruning(Mancala_alpha_beta.step(mancala, side, move),\
                                                 mancala.get_opponent_side(side), \
                                                 alpha, beta, depth-1)
                 if value > optimal_value:
@@ -85,9 +85,9 @@ class Mancala_alpha_beta(Mancala):
             print(mancala.get_all_possible_moves(side))
             print("---------------------")
             for move in mancala.get_all_possible_moves(side):
-                print("N_move: " + str(move + 1))
-                print(Mancala_alpha_beta.step(mancala, side, move + 1))
-                _, value = Mancala_alpha_beta.alpha_beta_pruning(Mancala_alpha_beta.step(mancala, side, move + 1),\
+                print("N_move: " + str(move))
+                print(Mancala_alpha_beta.step(mancala, side, move))
+                _, value = Mancala_alpha_beta.alpha_beta_pruning(Mancala_alpha_beta.step(mancala, side, move),\
                                                       mancala.get_opponent_side(side), \
                                                       alpha, beta, depth-1)
                 if value < optimal_value:
