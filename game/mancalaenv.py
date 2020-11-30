@@ -8,8 +8,11 @@ class MancalaEnv(Mancala):
         super().__init__(holes, stones, board)
         self.move_history = None
 
+    def reset(self, board=None):
+        super().reset(board)
+        self.move_history = []
+
     # evaluate the current status of the game
-    # returns: next_move_player, score_for_this_move, game_has_ended
     def _evaluate(self, side, last_pos, move, store_score_diff):
 
         if self._has_over_half_stones(side):
@@ -53,7 +56,7 @@ class MancalaEnv(Mancala):
         # extra move reward
         elif self._is_store(side, last_pos):
             next_move_player = side
-            score = 3
+            score = 5
             game_ended = False
 
         # if the last position is in an self empty hole while the according opponent's hole
@@ -87,7 +90,12 @@ class MancalaEnv(Mancala):
         return next_move_player, score, game_ended
 
     # select a hole to move by player
+    # returns: next_move_player, score_for_this_move, game_has_ended
     def step(self, side, hole):
+        # print("In step, side:", side, "hole:", hole)
+        if hole not in self.get_valid_moves(side):
+            return None, -100, True
+
         my_score_before_move = self.board[self._get_store(side)]
         opponent_score_before_move = self.board[self._get_opponent_store(side)]
 

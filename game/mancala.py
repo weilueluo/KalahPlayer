@@ -99,7 +99,12 @@ class Mancala:
     # check whether the player has legal move
     def _all_holes_empty(self, side):
         start = self._get_start_hole(side)
-        return np.any(self.board[start:start + self.n_holes])
+        return not np.any(self.board[start:start + self.n_holes])
+
+    # find all valid move for a side
+    def get_valid_moves(self, side):
+        start = self._get_start_hole(side)
+        return np.nonzero(self.board[start:start+self.n_holes])[0] + 1
 
     # print the board
     def __str__(self):
