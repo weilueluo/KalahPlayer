@@ -16,7 +16,7 @@ class RandomAgent:
         move = RandomAgent.get_random_move(available_moves)
         # convert the move from board index to move
         move += offset
-        print("Random move is:" + str(move))
+        print("Random move is: " + str(move))
         return move
 
     # get the valid moves in the board

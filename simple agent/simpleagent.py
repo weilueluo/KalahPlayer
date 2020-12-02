@@ -16,7 +16,7 @@ class SimpleAgent:
         move = SimpleAgent.get_suggested_move(board,side,available_moves)
         # convert the move from board index to move
         move += offset
-        print("Suggest move is:" + str(move))
+        print("Suggest move is: " + str(move))
         return move
 
     # get the valid moves in the board
