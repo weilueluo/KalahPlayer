@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class Parser:
     def __init__(self, server_text):
         self.msg = server_text
@@ -33,9 +36,9 @@ class Parser:
         #             print(next_move)
         elif self.is_state_change():
             change_str, moveswap, board, side = self.msg.split(';')
-            if moveswap.isdigit():                                         # move state
+            if moveswap.isdigit():  # move state
                 print(next_move, ' moved ', moveswap, 'th hole.')
-            else:                                                          # swap state
+            else:  # swap state
                 print('The board has been swapped.')
 
             next_move = side
