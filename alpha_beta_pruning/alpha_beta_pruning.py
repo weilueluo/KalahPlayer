@@ -5,7 +5,7 @@ from .abpmancala import ABPMancala
 
 
 def is_max_node(side):
-    return side != 'north'
+    return side == 'south'
 
 
 def get_south_scores(mancala):
@@ -22,8 +22,7 @@ def get_heuristics(mancala):
 
 
 def is_terminal_node(mancala):
-    return mancala.has_over_half_stones("north") or \
-           mancala.has_over_half_stones("south")
+    return mancala.game_over
 
 
 # def get_board(mancala):
@@ -40,15 +39,15 @@ def get_all_possible_moves(mancala, side):
     return mancala.get_valid_moves(side)
 
 
-
 # There we don't take several steps in a row of the same player into account,
 # because the opponent will not let that happen.??
-''' The reason why absolute value of alpha or beta sets to be -99 is because
-    total scores in that game is 7 * 14 = 98'''
+# ''' The reason why absolute value of alpha or beta sets to be -99 is because
+#     total scores in that game is 7 * 14 = 98'''
 
 
 # This function returns two things, the best move and best value got
 def alpha_beta_pruning(mancala, side, alpha=-99, beta=99, depth=4):
+    print(f'entered alpha_beta_pruning')
     if depth == 0 or is_terminal_node(mancala):
         print("H: " + str(get_heuristics(mancala)))
         print(mancala)
