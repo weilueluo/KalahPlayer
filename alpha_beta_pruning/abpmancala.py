@@ -8,7 +8,7 @@ class ABPMancala(Mancala):
         super().__init__(holes, stones, board)
 
     def step(self, side, hole):
-        mancala_copy = ABPMancala(holes=self.n_holes, stones=self.n_stones, board=self.board)
+        mancala_copy = Mancala(holes=self.n_holes, stones=self.n_stones, board=self.board)
 
         mancala_copy.step(side, hole)
 
@@ -25,4 +25,4 @@ class ABPMancala(Mancala):
             mancala_copy.board[last_pos] = 0
             mancala_copy.board[mancala_copy.get_opponent_mirror_pos(last_pos)] = 0
 
-        return mancala_copy
+        return ABPMancala(holes=self.n_holes, stones=self.n_stones, board=mancala_copy.board)
