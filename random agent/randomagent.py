@@ -2,8 +2,10 @@ import random
 import numpy as np
 from copy import deepcopy
 from mancala import Mancala
-
-class RandomAgent:
+import sys
+sys.path.append('..')
+from agent import Agent
+class RandomAgent(Agent):
     # return a move
     def get_move(board, side):
         if side == 'north':

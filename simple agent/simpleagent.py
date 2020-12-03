@@ -2,7 +2,9 @@ import random
 import numpy as np
 from copy import deepcopy
 from mancala import Mancala
-
+import sys
+sys.path.append('..')
+from agent import Agent
 class SimpleAgent:
     # return a move
     def get_move(board, side):
