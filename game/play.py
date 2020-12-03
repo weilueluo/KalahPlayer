@@ -13,8 +13,8 @@ def play(agent1: Agent, agent2: Agent, n_holes=7, n_stones=7):
             move = agent1.get_move(game, 'north')
         else:
             move = agent2.get_move(game, 'south')
-        print(game)
-        print(f'Current Player: {player}, move: {move}')
+        # print(game)
+        # print(f'Current Player: {player}, move: {move}')
         game.step(player, move)
         player = game.next_player
 

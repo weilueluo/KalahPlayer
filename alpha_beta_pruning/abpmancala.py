@@ -8,7 +8,7 @@ class ABPMancala(Mancala):
         super().__init__(holes, stones, board)
 
     def step(self, side, hole):
-        mancala_copy = Mancala(holes=self.n_holes, stones=self.n_stones, board=self.board)
+        mancala_copy = Mancala(holes=self.n_holes, stones=self.n_stones, board=deepcopy(self.board))
 
         mancala_copy.step(side, hole)
 

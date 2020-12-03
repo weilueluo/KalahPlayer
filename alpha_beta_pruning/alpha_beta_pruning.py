@@ -47,22 +47,14 @@ def get_all_possible_moves(mancala, side):
 
 # This function returns two things, the best move and best value got
 def alpha_beta_pruning(mancala, side, alpha=-99, beta=99, depth=4):
-    print(f'entered alpha_beta_pruning')
     if depth == 0 or is_terminal_node(mancala):
-        print("H: " + str(get_heuristics(mancala)))
-        print(mancala)
         # returns none means move cannot be made because the game is finished or
         # or searching depth reaches maximum.
         return None, get_heuristics(mancala)
     if is_max_node(side):
         optimal_value = -99
         optimal_move = None
-        print("South:")
-        print(mancala)
-        print(mancala.get_valid_moves(side))
         for move in mancala.get_valid_moves(side):
-            print("S_move: " + str(move))
-            print(ABPMancala.step(mancala, side, move))
             _, value = alpha_beta_pruning(ABPMancala.step(mancala, side, move), \
                                           mancala.get_opponent_side(side), \
                                           alpha, beta, depth - 1)
@@ -71,20 +63,12 @@ def alpha_beta_pruning(mancala, side, alpha=-99, beta=99, depth=4):
                 optimal_move = move
             alpha = max(alpha, optimal_value)
             if beta <= alpha:
-                print("pruning")
                 break
-
         return optimal_move, optimal_value
     else:
         optimal_value = 99
         optimal_move = None
-        print("north:")
-        print(mancala)
-        print(mancala.get_valid_moves(side))
-        print("---------------------")
         for move in mancala.get_valid_moves(side):
-            print("N_move: " + str(move))
-            print(ABPMancala.step(mancala, side, move))
             _, value = alpha_beta_pruning(ABPMancala.step(mancala, side, move), \
                                           mancala.get_opponent_side(side), \
                                           alpha, beta, depth - 1)
@@ -94,8 +78,5 @@ def alpha_beta_pruning(mancala, side, alpha=-99, beta=99, depth=4):
             beta = min(beta, optimal_value)
 
             if beta <= alpha:
-                print(beta)
-                print(alpha)
-                print("pruning")
                 break
         return optimal_move, optimal_value
