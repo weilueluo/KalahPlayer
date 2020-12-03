@@ -73,7 +73,7 @@ def alpha_beta_pruning(mancala, side, alpha = -99, beta = 99, depth = 4):
             if value > optimal_value:
                 optimal_value = value
                 optimal_move = move
-            alpha = max(alpha, optimal_move)
+            alpha = max(alpha, optimal_value)
             if beta <= alpha:
                 print("pruning")
                 break
@@ -95,7 +95,7 @@ def alpha_beta_pruning(mancala, side, alpha = -99, beta = 99, depth = 4):
             if value < optimal_value:
                 optimal_value = value
                 optimal_move = move
-            beta = min(beta, optimal_move)
+            beta = min(beta, optimal_value)
 
             if beta <= alpha:
                 print(beta)
