@@ -41,6 +41,7 @@ class SimpleAgent(Agent):
         return valid_moves
 
     # check the increase in scores after a move
+    @staticmethod
     def points_increase(old_board, new_board, side):
         if side == 'north':
             scoring_pos = 7
@@ -51,6 +52,7 @@ class SimpleAgent(Agent):
     # check the max the player can got in the coming move
     # do not take into account extra moving case
     # in the SimpleAgent, it calculates the opponent's max increase
+    @staticmethod
     def max_increase_normal(board, side, available_moves):
         # list to store all the increase in scores for each
         # avaliable moves
@@ -71,6 +73,7 @@ class SimpleAgent(Agent):
         return max(scores_increase)
 
     # suggests a move using simple rules
+    @staticmethod
     def get_suggested_move(board, side, available_moves):
         game = Mancala()
         # do a move to avoid pie rule
@@ -93,16 +96,19 @@ class SimpleAgent(Agent):
         for i in available_moves:
             newboard = deepcopy(board)
             game.board = newboard
-            info = game.step(side, i + offset)
+            # info = game.step(side, i + offset)
+            game.step(side, i + offset)
             # if the move can lead to win, perform that move
-            if info == (side + ':has won'):
+            # if info == (side + ':has won'):
+            if game.winner == side:
                 # print("detected a wining move......")
                 return i
             # else, record the position score
             position_score = 0
             # if it can give an extra move, it get the point depend on how
             # close it is to the self scoring well
-            if info == (side + ':continue'):
+            # if info == (side + ':continue'):
+            if game.next_player == side:
                 # print("has an extra move")
                 position_score += (i + offset)
             # it can also get the score according to how much points it can bring
