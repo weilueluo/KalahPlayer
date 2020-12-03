@@ -8,5 +8,5 @@ from mancala import Mancala
 class AlphaPruningAgent(Agent):
     def get_move(board, side):
         mancala = Mancala(7,7,board)
-        move, _ = alpha_beta_pruning(mancala, side)
+        move, _ = alpha_beta_pruning.alpha_beta_pruning(mancala, side)
         return move

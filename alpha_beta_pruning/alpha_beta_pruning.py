@@ -21,8 +21,8 @@ def is_terminal_node(mancala):
     return mancala.has_over_half_stones("north") or \
             mancala.has_over_half_stones("south")
 
-def get_board(mancala):
-    return mancala.board
+# def get_board(mancala):
+#     return mancala.board
 
 # def get_store(mancala, side):
 #     return mancala.south_store if side == mancala.south else mancala.north_store

@@ -14,7 +14,8 @@ class Mancala:
         if board is not None:
             self.board = board
 
-
+    def get_store(self, side):
+        return self.south_store if side == self.south else self.north_store
     def reset(self):
         self.board = np.full((self.n_holes+1) * 2, self.n_stones)
         self.board[self.n_holes] = 0
