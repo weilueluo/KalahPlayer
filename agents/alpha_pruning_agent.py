@@ -11,7 +11,10 @@ from alpha_beta_pruning.alpha_beta_pruning import alpha_beta_pruning
 
 
 class AlphaPruningAgent(Agent):
+    def __init__(self, depth=4):
+        self.depth = depth
+
     def get_move(self, game, side):
         mancala = ABPMancala(game.n_holes, game.n_holes, game.board)
-        move, _ = alpha_beta_pruning(mancala, side)
+        move, _ = alpha_beta_pruning(mancala, side, depth=self.depth)
         return move

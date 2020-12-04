@@ -12,71 +12,82 @@ def init_weights(layer):
 
 class MancalaModel(nn.Module):
 
-    def __init__(self, n_inputs, n_outputs):
+    def __init__(self, n_inputs, n_outputs, hidden_size):
         super().__init__()
 
-        n_neurons = 256
+        n_neurons = 1024
 
         def create_block(n_in, n_out, activation=True):
-            block = nn.ModuleList()
-            block.append(nn.Linear(n_in, n_out))
+            block = [nn.Linear(n_in, n_out)]
             if activation:
                 block.append(nn.ReLU())
-            return block
+            return nn.Sequential(*block)
 
-        self.blocks = nn.ModuleList()
+        self.blocks = []
         self.blocks.append(create_block(n_inputs, n_neurons))
-        self.blocks.append(create_block(n_neurons, n_neurons))
+        self.blocks.append(nn.Dropout(p=0.2))
+        self.blocks.append(create_block(n_neurons, hidden_size))
 
-        self.actor_block = nn.ModuleList()
-        self.critic_block = nn.ModuleList()
+        self.lstm = nn.LSTMCell(input_size=hidden_size, hidden_size=hidden_size)
 
-        self.actor_block.append(create_block(n_neurons, n_outputs, activation=False))
-        self.critic_block.append(create_block(n_neurons, 1, activation=False))
+        self.actor_block = []
+        self.critic_block = []
+
+        self.actor_block.append(create_block(hidden_size, n_outputs, activation=False))
+        self.critic_block.append(create_block(hidden_size, 1, activation=False))
+
+        self.blocks = nn.Sequential(*self.blocks)
+        self.actor_block = nn.Sequential(*self.actor_block)
+        self.critic_block = nn.Sequential(*self.critic_block)
 
         self.apply(init_weights)
 
-    def forward(self, x):
-        for module in self.blocks:
-            for layer in module:
-                x = layer(x)
-        actor = x
-        critics = x
-        for module in self.actor_block:
-            for layer in module:
-                actor = layer(actor)
-        for module in self.critic_block:
-            for layer in module:
-                critics = layer(critics)
-        return F.softmax(actor, dim=-1), critics
+    def forward(self, x, h):
+        x = self.blocks(x)
+        hx, cx = self.lstm(x, h)
+        actor = critics = hx
+        actor = self.actor_block(actor)
+        critics = self.critic_block(critics)
+        return F.softmax(actor, dim=-1), critics, (hx, cx)
 
 
-class MancalaModelV2(nn.Module):
-
-    def __init__(self, n_inputs=17):
-        super().__init__()
-
-        n_neurons = 512
-
-        def create_block(n_in, n_out, activation=True):
-            block = nn.ModuleList()
-            block.append(nn.Linear(n_in, n_out))
-            if activation:
-                block.append(nn.Dropout(p=0.1))
-                block.append(nn.ReLU())
-            return block
-
-        self.blocks = nn.ModuleList()
-        self.blocks.append(create_block(n_inputs, n_neurons))
-        # for _ in range(1):
-        #     self.blocks.append(create_block(n_neurons, n_neurons))
-        self.blocks.append(create_block(n_neurons, n_neurons//2, activation=False))
-        self.blocks.append(create_block(n_neurons//2, 1, activation=False))
-
-        self.apply(init_weights)
-
-    def forward(self, x):
-        for module in self.blocks:
-            for layer in module:
-                x = layer(x)
-        return x
+# Simple Agent 100% model
+# class MancalaModel(nn.Module):
+#
+#     def __init__(self, n_inputs, n_outputs, hidden_size):
+#         super().__init__()
+#
+#         n_neurons = 1024
+#
+#         def create_block(n_in, n_out, activation=True):
+#             block = [nn.Linear(n_in, n_out)]
+#             if activation:
+#                 block.append(nn.ReLU())
+#             return nn.Sequential(*block)
+#
+#         self.blocks = []
+#         self.blocks.append(create_block(n_inputs, n_neurons))
+#         self.blocks.append(nn.Dropout(p=0.2))
+#         self.blocks.append(create_block(n_neurons, hidden_size))
+#
+#         self.lstm = nn.LSTMCell(input_size=hidden_size, hidden_size=hidden_size)
+#
+#         self.actor_block = []
+#         self.critic_block = []
+#
+#         self.actor_block.append(create_block(hidden_size, n_outputs, activation=False))
+#         self.critic_block.append(create_block(hidden_size, 1, activation=False))
+#
+#         self.blocks = nn.Sequential(*self.blocks)
+#         self.actor_block = nn.Sequential(*self.actor_block)
+#         self.critic_block = nn.Sequential(*self.critic_block)
+#
+#         self.apply(init_weights)
+#
+#     def forward(self, x, h):
+#         x = self.blocks(x)
+#         hx, cx = self.lstm(x, h)
+#         actor = critics = hx
+#         actor = self.actor_block(actor)
+#         critics = self.critic_block(critics)
+#         return F.softmax(actor, dim=-1), critics, (hx, cx)

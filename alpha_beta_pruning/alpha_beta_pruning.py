@@ -46,7 +46,7 @@ def get_all_possible_moves(mancala, side):
 
 
 # This function returns two things, the best move and best value got
-def alpha_beta_pruning(mancala, side, alpha=-99, beta=99, depth=4):
+def alpha_beta_pruning(mancala, side, alpha=-99, beta=99, depth=3):
     if depth == 0 or is_terminal_node(mancala):
         # returns none means move cannot be made because the game is finished or
         # or searching depth reaches maximum.

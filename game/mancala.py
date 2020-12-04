@@ -15,6 +15,7 @@ class Mancala:
         self.game_over = None
         self.winner = None
 
+        self.move_history = []
         self.board = None
         self.reset(board)
 
@@ -32,6 +33,7 @@ class Mancala:
         self.next_player = None
         self.game_over = None
         self.winner = None
+        self.move_history = []
 
     def empty_hole_end_game(self, side):
         def sum_side(side):
@@ -69,7 +71,9 @@ class Mancala:
 
         # extra move reward
         elif self.is_store(side, self.last_pos):
+            self.winner = None
             self.next_player = side
+            self.game_over = False
 
         # if the last position is in an self empty hole while the according opponent's hole
         # has stones in it, take the stones from both holes
@@ -96,6 +100,10 @@ class Mancala:
 
     # select a hole to move by player
     def step(self, side, hole):
+        hole = int(hole)
+        if hole not in self.get_valid_moves(side):
+            self.game_over = True
+            self.winner = self.get_opponent_side(side)
         pos = self.get_board_pos(side, hole)
         stones = self.board[pos]
         self.board[pos] = 0
@@ -113,6 +121,7 @@ class Mancala:
             pos = (pos + 1) % len(self.board)
         self.last_pos = last_pos
         self.evaluate(side)
+        self.move_history.append((side, hole, self.__str__()))
 
     # return the position of player's scoring well
     def get_store(self, side):
