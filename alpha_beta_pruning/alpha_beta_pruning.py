@@ -56,8 +56,9 @@ def alpha_beta_pruning(mancala, side, alpha=-99, beta=99, depth=3):
         optimal_move = None
         for move in mancala.get_valid_moves(side):
             _, value = alpha_beta_pruning(ABPMancala.step(mancala, side, move), \
-                                          mancala.get_opponent_side(side), \
-                                          alpha, beta, depth - 1)
+                                      mancala.get_opponent_side(side), \
+                                      alpha, beta, depth - 1)
+
             if value > optimal_value:
                 optimal_value = value
                 optimal_move = move
