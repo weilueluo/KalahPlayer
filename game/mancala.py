@@ -37,19 +37,18 @@ class Mancala:
 
     # def empty_hole_end_game(self, side):
 
-
-        # if self.board[self.get_store(side)] > self.board[self.get_opponent_store(side)]:
-        #     # win game
-        #     self.winner = side
-        #
-        # elif self.board[self.get_store(side)] < self.board[self.get_opponent_store(side)]:
-        #     # lose game
-        #     self.winner = self.get_opponent_side(side)
-        # else:
-        #     # tie
-        #     self.winner = None
-        #
-        # self.game_over = True
+    # if self.board[self.get_store(side)] > self.board[self.get_opponent_store(side)]:
+    #     # win game
+    #     self.winner = side
+    #
+    # elif self.board[self.get_store(side)] < self.board[self.get_opponent_store(side)]:
+    #     # lose game
+    #     self.winner = self.get_opponent_side(side)
+    # else:
+    #     # tie
+    #     self.winner = None
+    #
+    # self.game_over = True
 
     def evaluate(self, side):
 
@@ -65,13 +64,8 @@ class Mancala:
             self.board[self.last_pos] = 0
             self.board[opponent_mirror_pos] = 0
 
-            self.next_player = self.get_opponent_side(side)
-            self.game_over = False
-
-        # extra move reward
-        elif self.is_store(side, self.last_pos):
             self.winner = None
-            self.next_player = side
+            self.next_player = self.get_opponent_side(side)
             self.game_over = False
 
         # check if a side is empty
@@ -81,6 +75,7 @@ class Mancala:
                 store = self.north_store if side == self.north else self.south_store
                 self.board[store] = self.board[start:start + self.n_holes].sum()
                 self.board[start:start + self.n_holes] = 0
+
             sum_side(self.north)
             sum_side(self.south)
             if self.board[self.get_store(side)] > self.board[self.get_opponent_store(side)]:
@@ -93,17 +88,24 @@ class Mancala:
                 # tie
                 self.winner = None
 
+            self.next_player = None
             self.game_over = True
 
         elif self.has_over_half_stones(side):
             # win game
             self.winner = side
             self.game_over = True
+            self.next_player = None
 
         elif self.has_over_half_stones(self.get_opponent_side(side)):
             # lose game
             self.winner = self.get_opponent_side(side)
             self.game_over = True
+            self.next_player = None
+        elif self.is_store(side, self.last_pos):
+            self.winner = None
+            self.next_player = side
+            self.game_over = False
 
         # normal move that does not do anything
         else:
@@ -118,7 +120,7 @@ class Mancala:
         if hole not in self.get_valid_moves(side):
             self.game_over = True
             self.winner = self.get_opponent_side(side)
-            self.next_player = self.get_opponent_side(side)
+            self.next_player = None
             self.last_pos = None
             return
         pos = self.get_board_pos(side, hole)
@@ -153,7 +155,7 @@ class Mancala:
     # verify whether it is player's hole
     def is_hole(self, side, pos):
         return (side == self.south and self.north_store < pos < self.south_store) \
-               or (side == self.north and 0 < pos < self.north_store)
+               or (side == self.north and 0 <= pos < self.north_store)
 
     # get the according opponent hole position given the self hole position
     def get_opponent_mirror_pos(self, self_pos):
