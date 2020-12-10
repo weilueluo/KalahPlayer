@@ -32,7 +32,7 @@ class ModelAgent(Agent):
             from models.train import get_model_input
             board = get_model_input(env, side).to(self.device)
             distribution, reward, self.hidden = self.model(board, self.hidden)
-            action = np.argmax(F.softmax(distribution, dim=-1).cpu()).item() + 1
+            action = np.argmax(distribution.cpu()).item() + 1
             return action
 
     # @staticmethod

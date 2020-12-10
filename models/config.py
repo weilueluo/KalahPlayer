@@ -34,6 +34,8 @@ class Config:
                  save_interval=2000,
                  evaluate_interval=2000,
                  evaluation_hook=None,
+                 writer_interval=100,
+                 opponent=None,
 
                  time_tag=datetime.today().strftime('%Y-%m-%d-%H-%M-%S'),
                  log_dir='runs',
@@ -44,6 +46,7 @@ class Config:
                  max_game_length=200):
 
         self.model_cls = model_cls
+        self.evaluation_hook = evaluation_hook
         self.optimizer_cls = optimizer_cls
         self.scheduler_cls = scheduler_cls
         self.scheduler_step_size = scheduler_step_size
@@ -59,12 +62,12 @@ class Config:
         self.max_clip_grad = max_clip_grad
         self.device = device
         self.seed = seed
+        self.writer_interval = writer_interval
+        self.opponent = opponent
 
         self.print_interval = print_interval
         self.save_interval = save_interval
         self.evaluate_interval = evaluate_interval
-
-        self.evaluation_hook = None
 
         self.time_tag = time_tag
         self.log_dir = log_dir

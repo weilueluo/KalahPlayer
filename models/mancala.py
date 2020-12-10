@@ -1,5 +1,4 @@
 from torch import nn
-from torch.functional import F
 from torch.nn import init
 
 
@@ -98,6 +97,17 @@ class MancalaModel(nn.Module):
 import torch
 
 
+class Normalization(nn.Module):
+    def __init__(self, eps):
+        super().__init__()
+        self.eps = eps
+
+    def forward(self, x: torch.Tensor):
+        x -= torch.min(x, dim=1, keepdim=True)[0]
+        x /= torch.max(x, dim=1, keepdim=True)[0] + self.eps
+        return x
+
+
 class LSTMMancalaModel(nn.Module):
 
     def __init__(self, n_inputs, n_outputs, hidden_size=512, neuron_size=512):
@@ -106,7 +116,9 @@ class LSTMMancalaModel(nn.Module):
         def create_block(n_in, n_out, activation=True):
             block = [nn.Linear(n_in, n_out)]
             if activation:
-                block.append(nn.ReLU())
+                block.append(nn.LeakyReLU())
+            # if normalization:
+            #     block.append(Normalization(1e-6))
             return nn.Sequential(*block)
 
         self.linear_block = []
@@ -116,19 +128,20 @@ class LSTMMancalaModel(nn.Module):
 
         # block 1: linear
         self.linear_block.append(create_block(n_inputs, neuron_size))
-        self.linear_block.append(nn.Dropout(p=0.1))
+        self.linear_block.append(nn.Dropout(p=0.2))
         self.linear_block.append(create_block(neuron_size, hidden_size))
 
         # block 3: LSTM
         self.lstm = nn.LSTMCell(input_size=hidden_size, hidden_size=hidden_size)
 
         # block 4: reduce size
-        self.reduce_block.append(create_block(hidden_size, hidden_size // 4))
-        self.reduce_block.append(create_block(hidden_size // 4, hidden_size // 8))
+        self.reduce_block.append(create_block(hidden_size, hidden_size // 2))
 
-        # block 5: output
-        self.actor_block.append(create_block(hidden_size // 8, n_outputs, activation=False))
-        self.critic_block.append(create_block(hidden_size // 8, 1, activation=False))
+        # block 5: actor and critic
+        # self.actor_block.append(create_block(hidden_size // 2, hidden_size // 4, normalization=False))
+        self.actor_block.append(create_block(hidden_size // 2, n_outputs, activation=False))
+        # self.critic_block.append(create_block(hidden_size // 2, hidden_size // 4, normalization=False))
+        self.critic_block.append(create_block(hidden_size // 2, 1, activation=False))
 
         self.linear_block = nn.Sequential(*self.linear_block)
         self.reduce_block = nn.Sequential(*self.reduce_block)

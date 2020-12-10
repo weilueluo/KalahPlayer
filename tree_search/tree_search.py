@@ -7,16 +7,15 @@ import random
 import numpy as np
 
 import sys
-sys.path.append('..')
 from game.mancala import Mancala
-from node import Node
+from .node import Node
 # from alpha_beta_pruning.alpha_beta_pruning_new import alpha_beta_pruning
 from alpha_beta_pruning.alpha_beta_pruning import alpha_beta_pruning
 
 class MCTS:
 
 
-    INFINITY = 1.0e400
+    INFINITY = float('inf')
 
     def winlose(side, game:Mancala):
         # print the heuristics of the current side
@@ -37,7 +36,6 @@ class MCTS:
 
         # score of other player
         s2 = game.board[game.get_store(game.get_opponent_side(side))]
-
 
         # total score
         total = float(game.n_stones * game.n_holes * 2)
@@ -113,7 +111,7 @@ class MCTS:
         return False, -1
 
     def get_again(game:Mancala, side):
-        return True if game.next_player == side else False
+        return game.next_player == side
 
     def get_opponent_side(side):
         return 'north' if side == 'south' else 'south'
@@ -131,10 +129,10 @@ class MCTS:
         rootPlayer = deepcopy(side)
 
         ### self holes, normally is game.board[8:15]
-        selfHoles = rootGame.board[rootGame.get_start_hole(side):rootGame.get_store(side)]
+        selfHoles = rootGame.get_holes(side)
     #     print(selfHoles)
         ### opponent's holes, normally is game.board[0:7]
-        oppoHoles = rootGame.board[rootGame.get_start_hole(rootGame.get_opponent_side(side)):rootGame.get_store(rootGame.get_opponent_side(side))]
+        oppoHoles = rootGame.get_holes(rootGame.get_opponent_side(side))
     #     print(oppoHoles)
 
     #     print('UCT Starts!!!!!!!!!!')
@@ -183,7 +181,7 @@ class MCTS:
 
 
             ##### SELECT #####
-            while node.possibleMoves.size == 0 and len(node.childNodes) > 0: # node is fully expanded and non-terminal
+            while node.possibleMoves.size != 0 and len(node.childNodes) > 0: # node is fully expanded and non-terminal
                 node = node.UCTselectChild()
                 game.step(node.side, node.move)
     #             print("Select Start Player:"+str(node.player.num)+" Move:"+str(node.move))

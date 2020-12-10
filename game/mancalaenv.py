@@ -14,12 +14,8 @@ class MancalaEnv(Mancala):
 
     # evaluate the current status of the game
     def _evaluate(self, side, move, score_increase):
-        if self.game_over and self.winner == side:
-            reward = 100
-        elif self.game_over and self.winner == self.get_opponent_side(side):
-            reward = -100
-        elif self.game_over and self.winner is None:
-            reward = -1  # encourage win instead of draw
+        if self.game_over:
+            reward = 100 if self.winner == 'side' else -100
         else:
             reward = score_increase
 
