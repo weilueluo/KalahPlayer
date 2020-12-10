@@ -164,13 +164,13 @@ class MCTS:
     #                     print(f'The final move is ', move)
                         return move
 
-                    catch_possible, catch_move = catchMove(rootPlayer, rootGame, child.move)
+                    catch_possible, catch_move = MCTS.catchMove(rootPlayer, rootGame, child.move)
                     ### if we can catch a move, then we do that move
                     if catch_possible:
     #                     print(f'The final move is ', child.move)
                         return child.move
 
-                    catch_possible, catch_move = catchMove(get_opponent_side(rootPlayer), rootGame, child.move)
+                    catch_possible, catch_move = MCTS.catchMove(MCTS.get_opponent_side(rootPlayer), rootGame, child.move)
                     ### if opponent can catch our move, then we do the move which prevents that
                     if catch_possible:
     #                     print(f'The final move is ', catch_move)
