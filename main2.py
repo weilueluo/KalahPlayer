@@ -9,8 +9,8 @@ from mancala import Mancala
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-print('connecting to localhost 12345')
-sock.bind(('localhost', 12345))
+print('connecting to localhost 12346')
+sock.bind(('localhost', 12346))
 sock.listen(1)
 server, address = sock.accept()
 
@@ -67,7 +67,7 @@ try:
 
             _,game_board = msg_parser.get_board()
             mancala = Mancala(7,7,game_board)
-            move = AlphaPruningAgent(max_depth=6, process_depth=0, thread_depth=100).get_move(mancala,side)
+            move = AlphaPruningAgent(max_depth=5, process_depth=0, thread_depth=10).get_move(mancala,side)
             message = "MOVE;" + str(move) + "\n"
             print(message)
             server.sendall(message.encode('utf-8'))
