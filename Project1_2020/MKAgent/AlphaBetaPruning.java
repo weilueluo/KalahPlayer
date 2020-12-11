@@ -72,7 +72,7 @@ public class AlphaBetaPruning {
                 .collect(Collectors.toList());
 
         if (threadDepth > 1) {
-            int processors = Runtime.getRuntime().availableProcessors();
+            int processors = Runtime.getRuntime().availableProcessors() / 2;
             ExecutorService executorService = Executors.newFixedThreadPool(processors);
             ExecutorCompletionService<Result> executor = new ExecutorCompletionService<>(executorService);
             List<Future<Result>> results = new ArrayList<>();
@@ -88,7 +88,7 @@ public class AlphaBetaPruning {
             }
             int resultCount = 0;
             boolean needMoreResult = true;
-            while (needMoreResult || resultCount > validMoves.size()) {
+            while (needMoreResult || resultCount < validMoves.size()) {
                 try {
                     Result result = executor.take().get();
                     if (comparator.apply(result.score, optimalValue)) {

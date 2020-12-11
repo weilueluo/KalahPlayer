@@ -172,6 +172,7 @@ public class Main {
 //
 //Process finished with exit code 0
 
+// optimized pruning
 // Game Finished, winner: NORTH
 //Player 1 move times: [23, 21, 18, 16, 10, 11, 9, 13, 9, 6, 5, 4, 4, 9, 6, 5, 5, 4, 4, 2, 3, 2, 0]
 //Player 1 avg move times: 8s
