@@ -100,8 +100,7 @@ public class AlphaBetaPruning {
                     createAlphaPruningTask(boardAndMoves.get(i), i, alpha, beta, depth, threadDepth)));
         }
         int resultCount = 0;
-        boolean needMoreResult = true;
-        while (needMoreResult || resultCount < boardAndMoves.size()) {
+        while (resultCount < boardAndMoves.size()) {
             try {
                 Result result = executor.take().get();
                 if (comparator.apply(result.score, optimalValue)) {
@@ -110,7 +109,7 @@ public class AlphaBetaPruning {
                 }
                 alpha = order.apply(alpha, optimalValue);
                 if (beta <= alpha) {
-                    needMoreResult = false;
+                    break;
                 }
             } catch (InterruptedException | ExecutionException ignore) {
                 // ignore
