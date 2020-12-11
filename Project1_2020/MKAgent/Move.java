@@ -14,7 +14,6 @@ public class Move {
      */
     private final int hole;
 
-
     /**
      * @param side The side of the board the player making the move is playing
      *             on.
@@ -42,5 +41,9 @@ public class Move {
      */
     public int getHole() {
         return hole;
+    }
+
+    public static Move of(Side side, int hole) {
+        return new Move(side, hole);
     }
 }

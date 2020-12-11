@@ -82,26 +82,29 @@ public class Board extends Observable implements Cloneable {
         }
     }
 
-    public static class GameState {
-        public final Side winner;
-        public final boolean isGameOver;
-        private GameState(Side winner, boolean isGameOver) {
-            this.winner  = winner;
-            this.isGameOver = isGameOver;
-        }
-
-        public static GameState of(Side winner, boolean isGameOver) {
-            return new GameState(winner, isGameOver);
-        }
-
-        @Override
-        public String toString() {
-            return "GameState{" +
-                    "winner=" + winner +
-                    ", isGameOver=" + isGameOver +
-                    '}';
-        }
-    }
+//    public static class GameState {
+//        public final Side winner;
+//        public final boolean isGameOver;
+//        public final boolean lastPosInStore;
+//        private GameState(Side winner, boolean isGameOver, boolean lastPosInStore) {
+//            this.winner  = winner;
+//            this.isGameOver = isGameOver;
+//            this.lastPosInStore = lastPosInStore;
+//        }
+//
+//        public static GameState of(Side winner, boolean isGameOver, boolean lastPosInStore) {
+//            return new GameState(winner, isGameOver, lastPosInStore);
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return "GameState{" +
+//                    "winner=" + winner +
+//                    ", isGameOver=" + isGameOver +
+//                    ", lastPosInStore=" + lastPosInStore +
+//                    '}';
+//        }
+//    }
 
     public boolean allHolesEmpty(Side side) {
         int row = indexOfSide(side);
@@ -124,24 +127,25 @@ public class Board extends Observable implements Cloneable {
         }
     }
 
-    public GameState state() {
-        int halfSeeds = this.seeds * this.holes;
-        boolean empty = false;
-        if (allHolesEmpty(Side.NORTH) || allHolesEmpty(Side.SOUTH)) {
-            sumHoles();
-            empty = true;
-        }
-
-        if (getSeedsInStore(Side.NORTH) > halfSeeds) {
-            return GameState.of(Side.NORTH, true);
-        } else if (getSeedsInStore(Side.SOUTH) > halfSeeds) {
-            return GameState.of(Side.SOUTH, true);
-        } else if (empty) {
-            return GameState.of(null, true);
-        } else {
-            return GameState.of(null, false);
-        }
-    }
+//    private GameState state(Side side, int lastPos, boolean lastPosInStore) {
+//        int halfSeeds = this.seeds * this.holes;
+//        boolean empty = false;
+//        if (allHolesEmpty(Side.NORTH) || allHolesEmpty(Side.SOUTH)) {
+//            sumHoles();
+//            empty = true;
+//        }
+//        if (getSeeds(side, lastPos) == 1 && getSeedsOp())
+//
+//        if (getSeedsInStore(Side.NORTH) > halfSeeds) {
+//            return GameState.of(Side.NORTH, true, lastPosInStore);
+//        } else if (getSeedsInStore(Side.SOUTH) > halfSeeds) {
+//            return GameState.of(Side.SOUTH, true, lastPosInStore);
+//        } else if (empty) {
+//            return GameState.of(null, true, lastPosInStore);
+//        } else {
+//            return GameState.of(null, false, lastPosInStore);
+//        }
+//    }
 
     /**
      * Creates a new board as the copy of a given one. Both copies can then be
@@ -165,43 +169,45 @@ public class Board extends Observable implements Cloneable {
         return this.seeds;
     }
 
-    // return the next player
-    public Side step(Side side, int hole) {
-        int seeds = getSeeds(side, hole);
-        if (seeds < 1) {
-            throw new IllegalArgumentException("The selected hole does not have any seed");
-        }
-        Side currSide = side;
-        while (seeds > 0) {
-            hole--;
-            if (hole < 0) {
-                hole = holes;
-                currSide = currSide.opposite();
-            }
-            if (hole == 0 && currSide == side) {
-                addSeedsToStore(currSide, 1);
-            } else if (hole != 0) {
-                addSeeds(currSide, hole, 1);
-            }
-            seeds--;
-        }
-        if (currSide == side && hole == 0) {
-            // land on self store, free move
-            return side;
-        } else {
-            return side.opposite();
-        }
-    }
+//    // return the next player
+//    public GameState step(Side side, int hole) {
+//        int seeds = getSeeds(side, hole);
+//        if (seeds < 1) {
+//            throw new IllegalArgumentException("The selected hole does not have any seed");
+//        }
+//        Side currSide = side;
+//        while (seeds > 0) {
+//            hole--;
+//            if (hole < 0) {
+//                hole = holes;
+//                currSide = currSide.opposite();
+//            }
+//            if (hole == 0 && currSide == side) {
+//                addSeedsToStore(currSide, 1);
+//            } else if (hole != 0) {
+//                addSeeds(currSide, hole, 1);
+//            }
+//            seeds--;
+//        }
+//
+//
+//        if (currSide == side && hole == 0) {
+//            // land on self store, free move
+//            return state(side, hole, true);
+//        } else {
+//            return state(side, hole, false);
+//        }
+//    }
 
-    public List<Integer> getValidMoves(Side side) {
-        List<Integer> validMoves = new ArrayList<>();
-        for (int i = 1; i <= holes; i++) {
-            if (getSeeds(side, i) != 0) {
-                validMoves.add(i);
-            }
-        }
-        return validMoves;
-    }
+//    public List<Integer> getValidMoves(Side side) {
+//        List<Integer> validMoves = new ArrayList<>();
+//        for (int i = 1; i <= holes; i++) {
+//            if (getSeeds(side, i) != 0) {
+//                validMoves.add(i);
+//            }
+//        }
+//        return validMoves;
+//    }
 
     /**
      * Creates a copy of the current board. Both copies can then be altered
@@ -213,6 +219,14 @@ public class Board extends Observable implements Cloneable {
     @Override
     public Board clone() throws CloneNotSupportedException {
         return new Board(this);
+    }
+
+    public Board uncheckedClone() {
+        try {
+            return clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Clone Error", e);
+        }
     }
 
     /**

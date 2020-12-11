@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.*;
+import java.util.stream.IntStream;
 
 /**
  * The main application class. It also provides methods for communication
@@ -60,60 +62,119 @@ public class Main {
      *
      * @param args Command line arguments.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
 //        Board board = new Board(7, 7);
 //        System.out.println(board);
 //        Agent player1 = new ABPAgent(6);
 //        int move = player1.getMove(board, Side.SOUTH);
 //        System.out.println("Player 1 get move: " + move);
-        evaluateMain();
+        evaluate();
     }
 
-    private static void evaluateMain() {
+
+    private static void threadTry() throws InterruptedException, ExecutionException {
+        int cores = Runtime.getRuntime().availableProcessors();
+        System.out.println("There are " + cores + " cores available");
+        ExecutorService executorService = Executors.newFixedThreadPool(cores);
+        ExecutorCompletionService<Integer> executor = new ExecutorCompletionService<>(executorService);
+        List<Future<Integer>> futures = new ArrayList<>();
+        IntStream.range(5, 10)
+                .parallel()
+                .forEach(i -> {
+                    Callable<Integer> callable = () -> {
+                        Thread.sleep(i * 1000);
+                        System.out.println("Thread " + i + " wakes up");
+                        return i;
+                    };
+                    futures.add(executor.submit(callable));
+                });
+        int count = 0;
+        while (count < 3) {
+            Integer i = executor.take().get();
+            System.out.println("Integer " + i + " Finished");
+            count++;
+        }
+        System.out.println("All Finished");
+        for (Future<Integer> future : futures) {
+            future.cancel(true);
+        }
+        System.out.println("All cancelled");
+    }
+
+
+    private static void evaluate() {
         Board board = new Board(7, 7);
+        Kalah game = new Kalah(board);
         boolean gameFinished = false;
         Side nextPlayer = Side.values()[new Random().nextInt(Side.values().length)];
-        Agent player1 = new ABPAgent(9);
+        Agent player1 = new ABPAgent(10, 1);
         Agent player2 = new RandomAgent();
 
-        List<Long> player1MoveTimesMs = new ArrayList<>();
-        List<Long> player2MoveTimesMs = new ArrayList<>();
+        List<Long> player1MoveTimes = new ArrayList<>();
+        List<Long> player2MoveTimes = new ArrayList<>();
         Instant startTime = Instant.now();
         while (!gameFinished) {
             int move;
             Instant moveStartTime = Instant.now();
             if (nextPlayer == Side.NORTH) {
                 move = player1.getMove(board, Side.NORTH);
-                player1MoveTimesMs.add(Duration.between(moveStartTime, Instant.now()).toMillis());
+                player1MoveTimes.add(Duration.between(moveStartTime, Instant.now()).getSeconds());
             } else {
                 move = player2.getMove(board, Side.SOUTH);
-                player2MoveTimesMs.add(Duration.between(moveStartTime, Instant.now()).toMillis());
+                player2MoveTimes.add(Duration.between(moveStartTime, Instant.now()).getSeconds());
             }
-            nextPlayer = board.step(nextPlayer, move);
-            Board.GameState state = board.state();
-            if (state.isGameOver) {
+//            System.out.println(Arrays.toString(game.getAllValidMoves(nextPlayer).toArray()));
+//            System.out.println("Player: " + nextPlayer + ", move: " + move);
+            nextPlayer = game.makeMove(Move.of(nextPlayer, move));
+            Kalah.State state = game.gameOver();
+//            System.out.println(game.getBoard());
+            if (state.over) {
                 gameFinished = true;
                 System.out.println("Game Finished, winner: " + state.winner);
             }
         }
-        System.out.println("Player 1 move times: " + Arrays.toString(player1MoveTimesMs.toArray()));
-        long player1AvgMoveTimeInMs = (long) player1MoveTimesMs.stream().mapToLong(i -> i).average().orElse(0);
-        System.out.println("Player 1 avg move times: " + msToPrettyString(player1AvgMoveTimeInMs));
+        System.out.println("Player 1 move times: " + Arrays.toString(player1MoveTimes.toArray()));
+        long player1AvgMoveTime = (long) player1MoveTimes.stream().mapToLong(i -> i).average().orElse(0);
+        System.out.println("Player 1 avg move times: " + player1AvgMoveTime + "s");
 
-        System.out.println("Player 2 move times: " + Arrays.toString(player2MoveTimesMs.toArray()));
-        long player2AvgMoveTimeInMs = (long) player2MoveTimesMs.stream().mapToLong(i -> i).average().orElse(0);
-        System.out.println("Player 2 avg move times: " + msToPrettyString(player2AvgMoveTimeInMs));
+        System.out.println("Player 2 move times: " + Arrays.toString(player2MoveTimes.toArray()));
+        long player2AvgMoveTime = (long) player2MoveTimes.stream().mapToLong(i -> i).average().orElse(0);
+        System.out.println("Player 2 avg move times: " + player2AvgMoveTime + "s");
 
-        System.out.println("Total Time taken: " + msToPrettyString(Duration.between(startTime, Instant.now()).toMillis()));
+        System.out.println("Total Time taken: " + Duration.between(startTime, Instant.now()).getSeconds() + "s");
     }
 
 
-    private static String msToPrettyString(long durationInMillis) {
-        long millis = durationInMillis % 1000;
-        long second = (durationInMillis / 1000) % 60;
-        long minute = (durationInMillis / (1000 * 60)) % 60;
-        long hour = (durationInMillis / (1000 * 60 * 60)) % 24;
-
-        return String.format("%02d:%02d:%02d.%d", hour, minute, second, millis);
-    }
+//    private static String msToPrettyString(long durationInMillis) {
+//        long millis = durationInMillis % 1000;
+//        long second = (durationInMillis / 1000) % 60;
+//        long minute = (durationInMillis / (1000 * 60)) % 60;
+//        long hour = (durationInMillis / (1000 * 60 * 60)) % 24;
+//
+//        return String.format("%02d:%02d:%02d.%d", hour, minute, second, millis);
+//    }
 }
+
+// Game Finished, winner: NORTH
+//Player 1 move times: [35, 33, 35, 37, 39, 41, 43, 46, 49, 52, 54, 56, 59, 65, 69, 76, 78, 83, 84, 21, 0, 0, 0, 0]
+//Player 1 avg move times: 43s
+//Player 2 move times: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+//Player 2 avg move times: 0s
+//Total Time taken: 1063s
+
+// sort desc
+//Game Finished, winner: NORTH
+//Player 1 move times: [34, 31, 33, 33, 33, 34, 35, 36, 37, 38, 38, 39, 39, 42, 44, 47, 49, 52, 55, 58, 62, 46, 10, 0, 0, 0]
+//Player 1 avg move times: 35s
+//Player 2 move times: [0, 0, 0]
+//Player 2 avg move times: 0s
+//Total Time taken: 937s
+//
+//Process finished with exit code 0
+
+// Game Finished, winner: NORTH
+//Player 1 move times: [23, 21, 18, 16, 10, 11, 9, 13, 9, 6, 5, 4, 4, 9, 6, 5, 5, 4, 4, 2, 3, 2, 0]
+//Player 1 avg move times: 8s
+//Player 2 move times: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+//Player 2 avg move times: 0s
+//Total Time taken: 200s

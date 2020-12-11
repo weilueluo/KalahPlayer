@@ -9,7 +9,7 @@ public class RandomAgent implements Agent {
 
     @Override
     public int getMove(Board board, Side side) {
-        List<Integer> validMoves = board.getValidMoves(side);
+        List<Integer> validMoves = Kalah.getAllValidMoves(board, side);
         return validMoves.get(random.nextInt(validMoves.size()));
     }
 }

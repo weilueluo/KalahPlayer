@@ -5,18 +5,17 @@ import static MKAgent.AlphaBetaPruning.alphaBetaPruning;
 public class ABPAgent implements Agent {
 
     private final int DEPTH;
-    public ABPAgent(int depth) {
+    private final int THREAD_DEPTH;
+
+    public ABPAgent(int depth, int threadDepth) {
         this.DEPTH = depth;
+        this.THREAD_DEPTH = threadDepth;
     }
 
     @Override
     public int getMove(Board board, Side side) {
-        try {
-            int maxReturn = board.getNoOfHoles() * board.getNoOfSeeds() + 1;
-            AlphaBetaPruning.Result result = alphaBetaPruning(board, side, -maxReturn, maxReturn, DEPTH);
-            return result.move;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        int maxReturn = board.getNoOfHoles() * board.getNoOfSeeds() + 1;
+        AlphaBetaPruning.Result result = alphaBetaPruning(board, side, 0, -maxReturn, maxReturn, DEPTH, THREAD_DEPTH);
+        return result.move;
     }
 }
