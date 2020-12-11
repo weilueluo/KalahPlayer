@@ -79,7 +79,7 @@ public class Main {
         Kalah game = new Kalah(board);
         boolean gameFinished = false;
         Side nextPlayer = Side.values()[new Random().nextInt(Side.values().length)];
-        Agent player1 = new ABPAgent(10, 2);
+        Agent player1 = new ABPAgent(9, 1);
         Agent player2 = new RandomAgent();
 
         List<Long> player1MoveTimes = new ArrayList<>();

@@ -106,27 +106,6 @@ public class Board extends Observable implements Cloneable {
 //        }
 //    }
 
-    public boolean allHolesEmpty(Side side) {
-        int row = indexOfSide(side);
-        for (int i = 0; i <= holes; i++) {
-            if (board[row][i] != 0) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private void sumHoles() {
-        for (Side side : Side.values()) {
-            int sum = 0;
-            for (int i = 1; i <= holes; i++) {
-                sum += getSeeds(side, i);
-                setSeeds(side, i, 0);
-            }
-            addSeedsToStore(side, sum);
-        }
-    }
-
 //    private GameState state(Side side, int lastPos, boolean lastPosInStore) {
 //        int halfSeeds = this.seeds * this.holes;
 //        boolean empty = false;
