@@ -67,9 +67,9 @@ try:
 
             _,game_board = msg_parser.get_board()
             mancala = Mancala(7,7,game_board)
-            move = AlphaPruningAgent(max_depth=5, process_depth=0, thread_depth=10).get_move(mancala,side)
+            move = AlphaPruningAgent(max_depth=2, process_depth=0, thread_depth=0).get_move(mancala,side)
             message = "MOVE;" + str(move) + "\n"
-            print(message)
+            #print(message)
             server.sendall(message.encode('utf-8'))
 except Exception as e:
     print("Exception:" + str(e))
