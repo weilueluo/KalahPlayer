@@ -1,4 +1,9 @@
-package MKAgent;
+package MKAgent.agents;
+
+import MKAgent.Board;
+import MKAgent.Kalah;
+import MKAgent.Side;
+import MKAgent.agents.Agent;
 
 import java.util.List;
 import java.util.Random;

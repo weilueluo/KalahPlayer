@@ -1,6 +1,10 @@
-package MKAgent;
+package MKAgent.agents;
 
-import static MKAgent.AlphaBetaPruning.alphaBetaPruning;
+import MKAgent.alphaBetaPruning.AlphaBetaPruning;
+import MKAgent.Board;
+import MKAgent.Side;
+
+import static MKAgent.alphaBetaPruning.AlphaBetaPruning.alphaBetaPruning;
 
 public class ABPAgent implements Agent {
 

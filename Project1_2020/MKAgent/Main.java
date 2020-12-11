@@ -1,6 +1,8 @@
 package MKAgent;
 
-import com.sun.javaws.IconUtil;
+import MKAgent.agents.ABPAgent;
+import MKAgent.agents.Agent;
+import MKAgent.agents.RandomAgent;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
@@ -72,42 +74,12 @@ public class Main {
     }
 
 
-    private static void threadTry() throws InterruptedException, ExecutionException {
-        int cores = Runtime.getRuntime().availableProcessors();
-        System.out.println("There are " + cores + " cores available");
-        ExecutorService executorService = Executors.newFixedThreadPool(cores);
-        ExecutorCompletionService<Integer> executor = new ExecutorCompletionService<>(executorService);
-        List<Future<Integer>> futures = new ArrayList<>();
-        IntStream.range(5, 10)
-                .parallel()
-                .forEach(i -> {
-                    Callable<Integer> callable = () -> {
-                        Thread.sleep(i * 1000);
-                        System.out.println("Thread " + i + " wakes up");
-                        return i;
-                    };
-                    futures.add(executor.submit(callable));
-                });
-        int count = 0;
-        while (count < 3) {
-            Integer i = executor.take().get();
-            System.out.println("Integer " + i + " Finished");
-            count++;
-        }
-        System.out.println("All Finished");
-        for (Future<Integer> future : futures) {
-            future.cancel(true);
-        }
-        System.out.println("All cancelled");
-    }
-
-
     private static void evaluate() {
         Board board = new Board(7, 7);
         Kalah game = new Kalah(board);
         boolean gameFinished = false;
         Side nextPlayer = Side.values()[new Random().nextInt(Side.values().length)];
-        Agent player1 = new ABPAgent(10, 1);
+        Agent player1 = new ABPAgent(10, 2);
         Agent player2 = new RandomAgent();
 
         List<Long> player1MoveTimes = new ArrayList<>();
@@ -123,11 +95,8 @@ public class Main {
                 move = player2.getMove(board, Side.SOUTH);
                 player2MoveTimes.add(Duration.between(moveStartTime, Instant.now()).getSeconds());
             }
-//            System.out.println(Arrays.toString(game.getAllValidMoves(nextPlayer).toArray()));
-//            System.out.println("Player: " + nextPlayer + ", move: " + move);
             nextPlayer = game.makeMove(Move.of(nextPlayer, move));
             Kalah.State state = game.gameOver();
-//            System.out.println(game.getBoard());
             if (state.over) {
                 gameFinished = true;
                 System.out.println("Game Finished, winner: " + state.winner);
