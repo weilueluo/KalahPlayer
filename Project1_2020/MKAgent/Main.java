@@ -64,13 +64,35 @@ public class Main {
      *
      * @param args Command line arguments.
      */
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
-//        Board board = new Board(7, 7);
-//        System.out.println(board);
-//        Agent player1 = new ABPAgent(6);
-//        int move = player1.getMove(board, Side.SOUTH);
-//        System.out.println("Player 1 get move: " + move);
-        evaluate();
+
+    // map: first move -> boolean
+    // hard code main
+
+    // time estimate: moves made, board, time -> alpha pruning depth, >= 3
+    // read: requirements & protocol
+
+    public static void main(String[] args) throws ExecutionException, InterruptedException, IOException, InvalidMessageException {
+//        evaluate();
+        while (true) {
+            String message = recvMsg();
+            MsgType type = Protocol.getMessageType(message);
+            switch (type) {
+                case START:
+                    // if our turn: send normal move
+                    // if their turn, do nothing
+                case STATE:
+                    // it is our turn:
+                    //     state == swap:
+                    //         send swap or not according to table
+                    //     state == change:
+                    //         if have enough time: send alpha pruning result
+                    //         if do not have enough time: send alpha pruning with less depth result
+                case END:
+                    // do nothing
+                default:
+                    throw new RuntimeException();
+            }
+        }
     }
 
 
@@ -79,6 +101,7 @@ public class Main {
         Kalah game = new Kalah(board);
         boolean gameFinished = false;
         Side nextPlayer = Side.values()[new Random().nextInt(Side.values().length)];
+
         Agent player1 = new ABPAgent(9, 1);
         Agent player2 = new RandomAgent();
 
@@ -88,6 +111,7 @@ public class Main {
         while (!gameFinished) {
             int move;
             Instant moveStartTime = Instant.now();
+            System.out.println("Player: " + nextPlayer + " is making a move");
             if (nextPlayer == Side.NORTH) {
                 move = player1.getMove(board, Side.NORTH);
                 player1MoveTimes.add(Duration.between(moveStartTime, Instant.now()).getSeconds());
