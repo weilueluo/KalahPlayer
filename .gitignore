@@ -2,5 +2,5 @@
 debug.log
 runs
 venv
-Project1_2020/out
+Project1_2020/out/*
 *.class
