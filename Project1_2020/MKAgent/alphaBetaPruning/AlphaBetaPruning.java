@@ -42,7 +42,8 @@ public class AlphaBetaPruning {
         return Kalah.gameOver(board).over;
     }
 
-    public static Result alphaBetaPruning(Board board, Side side, int seq, int alpha, int beta, int depth, int threadDepth) {
+    public static Result alphaBetaPruning(Board board, Side side, int seq, int alpha, int beta, int depth,
+                                          int threadDepth) {
         if (depth == 0 || isTerminal(board)) {
             return Result.of(-1, getHeuristic(board), seq);
         }
@@ -70,7 +71,11 @@ public class AlphaBetaPruning {
         }
     }
 
-    private static Result _normalAlphaBetaPruning(List<Tuple<Board, Side, Integer>> boardAndMoves, BiFunction<Integer, Integer, Boolean> comparator, BiFunction<Integer, Integer, Integer> order, int optimalValue, int optimalMove, int seq, int alpha, int beta, int depth, int threadDepth) {
+    private static Result _normalAlphaBetaPruning(List<Tuple<Board, Side, Integer>> boardAndMoves,
+                                                  BiFunction<Integer, Integer, Boolean> comparator,
+                                                  BiFunction<Integer, Integer, Integer> order,
+                                                  int optimalValue, int optimalMove, int seq, int alpha, int beta,
+                                                  int depth, int threadDepth) {
         for (Tuple<Board, Side, Integer> boardSideTuple : boardAndMoves) {
             Result result = alphaBetaPruning(boardSideTuple.getFirst(), boardSideTuple.getSecond(), seq, alpha, beta,
                     depth - 1, threadDepth);
@@ -141,12 +146,13 @@ public class AlphaBetaPruning {
     }
 
     private static <T> ExecutorCompletionService<T> getExecutor() {
-        int processors = Runtime.getRuntime().availableProcessors() / 2;
+        int processors = Runtime.getRuntime().availableProcessors() - 1;
         ExecutorService executorService = Executors.newFixedThreadPool(processors);
         return new ExecutorCompletionService<>(executorService);
     }
 
-    private static Callable<Result> createAlphaPruningTask(Utils.Tuple<Board, Side, Integer> tuple, int seq, int alpha, int beta, int depth, int threadDepth) {
+    private static Callable<Result> createAlphaPruningTask(Utils.Tuple<Board, Side, Integer> tuple, int seq, int alpha,
+                                                           int beta, int depth, int threadDepth) {
         Board boardCopy = tuple.getFirst();
         Side nextPlayer = tuple.getSecond();
         return () -> alphaBetaPruning(boardCopy, nextPlayer, seq, alpha, beta, depth - 1, threadDepth - 1);
