@@ -11,12 +11,15 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.*;
-import java.util.stream.IntStream;
+import java.util.concurrent.ExecutionException;
+
 
 /**
  * The main application class. It also provides methods for communication
@@ -59,6 +62,15 @@ public class Main {
         return message.toString();
     }
 
+    private static String receiveMessage() {
+        try {
+            return recvMsg();
+        } catch (IOException e) {
+            System.err.println("Encountered IOException while receiving message: " + e);
+            return "";
+        }
+    }
+
     /**
      * The main method, invoked when the program is started.
      *
@@ -70,7 +82,6 @@ public class Main {
 
     // time estimate: moves made, board, time -> alpha pruning depth, >= 3
     // read: requirements & protocol
-
     public static void main(String[] args) throws ExecutionException, InterruptedException, IOException, InvalidMessageException {
         evaluate();
 //        while (true) {
@@ -95,32 +106,95 @@ public class Main {
 //        }
     }
 
+    private static Optional<MsgType> getMessageType(String message) {
+        try {
+            return Optional.of(Protocol.getMessageType(message));
+        } catch (InvalidMessageException e) {
+            System.err.println("Cannot infer message type from message: " + e);
+        }
+        return Optional.empty();
+    }
+
+    private static void handleStartMessage(String message) {
+        try {
+            boolean ourStart = Protocol.interpretStartMsg(message);
+            if (ourStart) {
+                sendMsg(Protocol.createMoveMsg(Play.getStartMove()));
+            } else {
+                // do nothing, opponent first move
+            }
+        } catch (InvalidMessageException e) {
+            System.err.println("Failed to interpret start message: " + e);
+        }
+    }
+
+    private static void handleStateMessage(String message, long secondsSpent) {
+
+    }
+
+    private static void handleEndMessage(String message) {
+
+    }
+
+    private static void _main(String[] args) throws IOException {
+        boolean gameFinished = false;
+        long secondsSpent = 0;
+        while (!gameFinished) {
+            String message = receiveMessage();
+            // start 1 seconds early, ensure we do not over-estimate time left.
+            Instant thisMoveStartTime = Instant.now().minus(1, ChronoUnit.SECONDS);
+            Optional<MsgType> messageType = getMessageType(message);
+            if (messageType.isPresent()) {
+                switch (messageType.get()) {
+                    case START:
+                        handleStartMessage(message);
+                        break;
+                    case STATE:
+                        handleStateMessage(message, secondsSpent);
+                        break;
+                    case END:
+                        handleEndMessage(message);
+                        gameFinished = true;
+                        break;
+                    default:
+                        System.err.println("Unexpected message type encountered: " + messageType.get());
+                        break;
+                }
+            }
+            // add time spent for this move
+            secondsSpent += Duration.between(thisMoveStartTime, Instant.now()).getSeconds();
+        }
+    }
 
     private static void evaluate() {
         Board board = new Board(7, 7);
         Kalah game = new Kalah(board);
         boolean gameFinished = false;
-        Side nextPlayer = Side.values()[new Random().nextInt(Side.values().length)];
+//        Side nextPlayer = Side.values()[new Random().nextInt(Side.values().length)];
+        Side nextPlayer = Side.NORTH;
 
         Agent player1 = new ABPAgent(11, 1);
-        Agent player2 = new RandomAgent();
+        Agent player2 = new ABPAgent(8, 1);
         Side winner = null;
 
         List<Long> player1MoveTimes = new ArrayList<>();
         List<Long> player2MoveTimes = new ArrayList<>();
         Instant startTime = Instant.now();
+        long moveSeconds;
         while (!gameFinished) {
             int move;
             Instant moveStartTime = Instant.now();
             System.err.println("Player: " + nextPlayer + " is making a move ...");
             if (nextPlayer == Side.NORTH) {
                 move = player1.getMove(board, Side.NORTH);
-                player1MoveTimes.add(Duration.between(moveStartTime, Instant.now()).getSeconds());
+                moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
+                player1MoveTimes.add(moveSeconds);
             } else {
                 move = player2.getMove(board, Side.SOUTH);
-                player2MoveTimes.add(Duration.between(moveStartTime, Instant.now()).getSeconds());
+                moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
+                player2MoveTimes.add(moveSeconds);
             }
-            System.err.println("move: " + move);
+            System.err.println("move: " + move + ", took " + moveSeconds + "s, board after move:");
             nextPlayer = game.makeMove(Move.of(nextPlayer, move));
             System.err.println(board);
             Kalah.State state = game.gameOver();

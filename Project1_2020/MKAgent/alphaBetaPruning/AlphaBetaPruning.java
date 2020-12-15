@@ -97,7 +97,9 @@ public class AlphaBetaPruning {
                                                        int optimalMove, int seq, int alpha, int beta, int depth,
                                                        int threadDepth) {
 
-        ExecutorCompletionService<Result> executor = getExecutor();
+        int processors = Runtime.getRuntime().availableProcessors() - 1;
+        ExecutorService executorService = Executors.newFixedThreadPool(processors);
+        ExecutorCompletionService<Result> executor = new ExecutorCompletionService<>(executorService);
         List<Future<Result>> results = new ArrayList<>();
 
         for (int i = 0; i < boardAndMoves.size(); i++) {
@@ -126,6 +128,7 @@ public class AlphaBetaPruning {
         for (Future<Result> future : results) {
             future.cancel(true);
         }
+        executorService.shutdown();
         return Result.of(optimalMove, optimalValue, seq);
     }
 
@@ -143,12 +146,6 @@ public class AlphaBetaPruning {
         Board boardCopy = board.uncheckedClone();
         Side nextPlayer = Kalah.makeMove(boardCopy, Move.of(side, move));
         return Utils.Tuple.of(boardCopy, nextPlayer, move);
-    }
-
-    private static <T> ExecutorCompletionService<T> getExecutor() {
-        int processors = Runtime.getRuntime().availableProcessors() - 1;
-        ExecutorService executorService = Executors.newFixedThreadPool(processors);
-        return new ExecutorCompletionService<>(executorService);
     }
 
     private static Callable<Result> createAlphaPruningTask(Utils.Tuple<Board, Side, Integer> tuple, int seq, int alpha,
