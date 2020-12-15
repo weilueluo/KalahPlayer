@@ -62,8 +62,13 @@ try:
 
         if first_move:
             if side == 'north' and msg_parser.is_our_turn():
-                message = "SWAP\n"
-                side = "south"
+                #message = "SWAP\n"
+                #message = "MOVE;1\n"
+                _,game_board = msg_parser.get_board()
+                mancala = Mancala(7,7,game_board)
+                move = AlphaPruningAgent(max_depth=7, process_depth=0, thread_depth=0).get_move(mancala,side)
+                message = "MOVE;" + str(move) + "\n"
+                #side = "north"
                 server.sendall(message.encode('utf-8'))
                 first_move = False
             elif side == 'south' and msg_parser.is_start():
@@ -74,6 +79,7 @@ try:
 
         elif msg_parser.is_our_turn():
             #print(side)
+            print("Here")
             if second_move:
                 if msg_parser.is_swap():
                     side = "north"
@@ -93,7 +99,7 @@ try:
                     break
             if has_win:
                 continue
-            move = AlphaPruningAgent(max_depth=4, process_depth=0, thread_depth=0).get_move(mancala,side)
+            move = AlphaPruningAgent(max_depth=7, process_depth=0, thread_depth=0).get_move(mancala,side)
             message = "MOVE;" + str(move) + "\n"
             print(message)
             server.sendall(message.encode('utf-8'))
