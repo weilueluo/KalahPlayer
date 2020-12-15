@@ -62,7 +62,7 @@ public class AlphaBetaPruning {
         int optimalMove = -1;
         List<Tuple<Board, Side, Integer>> boardAndMoves = getAllPossibleNextBoards(board, side);
 
-        if (threadDepth > 1) {
+        if (threadDepth >= 1) {
             return _multiThreadAlphaBetaPruning(boardAndMoves, comparator, order, optimalValue, optimalMove,
                     seq, alpha, beta, depth, threadDepth);
         } else {
