@@ -20,56 +20,16 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
+import static MKAgent.Utils.receiveMessage;
+import static MKAgent.Utils.sendMsg;
+
 
 /**
  * The main application class. It also provides methods for communication
  * with the game engine.
  */
 public class Main {
-    /**
-     * Input from the game engine.
-     */
-    private static Reader input = new BufferedReader(new InputStreamReader(System.in));
 
-    /**
-     * Sends a message to the game engine.
-     *
-     * @param msg The message.
-     */
-    public static void sendMsg(String msg) {
-        System.out.print(msg);
-        System.out.flush();
-    }
-
-    /**
-     * Receives a message from the game engine. Messages are terminated by
-     * a '\n' character.
-     *
-     * @return The message.
-     * @throws IOException if there has been an I/O error.
-     */
-    public static String recvMsg() throws IOException {
-        StringBuilder message = new StringBuilder();
-        int newCharacter;
-
-        do {
-            newCharacter = input.read();
-            if (newCharacter == -1)
-                throw new EOFException("Input ended unexpectedly.");
-            message.append((char) newCharacter);
-        } while ((char) newCharacter != '\n');
-
-        return message.toString();
-    }
-
-    private static String receiveMessage() {
-        try {
-            return recvMsg();
-        } catch (IOException e) {
-            System.err.println("Encountered IOException while receiving message: " + e);
-            return "";
-        }
-    }
 
     /**
      * The main method, invoked when the program is started.
@@ -120,16 +80,20 @@ public class Main {
             boolean ourStart = Protocol.interpretStartMsg(message);
             if (ourStart) {
                 sendMsg(Protocol.createMoveMsg(Play.getStartMove()));
-            } else {
-                // do nothing, opponent first move
-            }
+            }  // else do nothing, opponent first move
         } catch (InvalidMessageException e) {
             System.err.println("Failed to interpret start message: " + e);
         }
     }
 
     private static void handleStateMessage(String message, long secondsSpent) {
+        Board board = new Board(7, 7);
+        try {
+            Protocol.MoveTurn moveTurn  = Protocol.interpretStateMsg(message, board);
 
+        } catch (InvalidMessageException e) {
+            System.err.println("Failed to interpret state message: " + e);
+        }
     }
 
     private static void handleEndMessage(String message) {
@@ -173,7 +137,7 @@ public class Main {
 //        Side nextPlayer = Side.values()[new Random().nextInt(Side.values().length)];
         Side nextPlayer = Side.NORTH;
 
-        Agent player1 = new ABPAgent(11, 1);
+        Agent player1 = new ABPAgent(12, 2);
         Agent player2 = new ABPAgent(8, 1);
         Side winner = null;
 
@@ -216,14 +180,7 @@ public class Main {
     }
 
 
-//    private static String msToPrettyString(long durationInMillis) {
-//        long millis = durationInMillis % 1000;
-//        long second = (durationInMillis / 1000) % 60;
-//        long minute = (durationInMillis / (1000 * 60)) % 60;
-//        long hour = (durationInMillis / (1000 * 60 * 60)) % 24;
-//
-//        return String.format("%02d:%02d:%02d.%d", hour, minute, second, millis);
-//    }
+
 }
 
 // Game Finished, winner: NORTH

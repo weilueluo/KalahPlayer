@@ -1,0 +1,213 @@
+Player: NORTH is making a move ...
+move: 1, took 1351s, board after move:
+1  --  8  8  8  8  8  8  0
+7  7  7  7  7  7  7  --  0
+
+Player: NORTH is making a move ...
+move: 2, took 1297s, board after move:
+2  --  9  9  9  9  9  0  0
+8  8  7  7  7  7  7  --  0
+
+Player: SOUTH is making a move ...
+move: 1, took 0s, board after move:
+2  --  9  9  9  9  9  0  1
+0  9  8  8  8  8  8  --  1
+
+Player: NORTH is making a move ...
+move: 4, took 1096s, board after move:
+3  --  10  10  10  0  9  0  1
+1  10  9  9  9  8  8  --  1
+
+Player: SOUTH is making a move ...
+move: 2, took 0s, board after move:
+3  --  10  10  10  1  10  1  2
+1  0  10  10  10  9  9  --  2
+
+Player: NORTH is making a move ...
+move: 6, took 1023s, board after move:
+4  --  11  0  10  1  10  1  3
+2  1  11  11  11  10  10  --  2
+
+Player: SOUTH is making a move ...
+move: 6, took 0s, board after move:
+4  --  12  1  11  2  11  2  4
+3  1  11  11  11  0  11  --  3
+
+Player: NORTH is making a move ...
+move: 6, took 855s, board after move:
+4  --  13  0  11  2  11  2  4
+3  1  11  11  11  0  11  --  3
+
+Player: SOUTH is making a move ...
+move: 7, took 0s, board after move:
+4  --  14  1  12  3  12  3  5
+4  2  12  11  11  0  0  --  4
+
+Player: NORTH is making a move ...
+move: 2, took 765s, board after move:
+4  --  14  1  13  4  13  0  5
+4  2  12  11  11  0  0  --  4
+
+Player: SOUTH is making a move ...
+move: 1, took 0s, board after move:
+4  --  14  1  13  4  13  0  5
+0  3  13  12  12  0  0  --  4
+
+Player: NORTH is making a move ...
+move: 4, took 526s, board after move:
+5  --  15  2  14  0  13  0  5
+0  3  13  12  12  0  0  --  4
+
+Player: NORTH is making a move ...
+move: 5, took 432s, board after move:
+20  --  16  3  0  0  14  1  6
+1  4  14  0  13  1  1  --  4
+
+Player: SOUTH is making a move ...
+move: 5, took 0s, board after move:
+20  --  17  4  1  1  15  2  7
+2  5  15  0  0  2  2  --  5
+
+Player: NORTH is making a move ...
+move: 1, took 570s, board after move:
+21  --  18  5  2  2  16  3  0
+2  5  15  0  0  2  2  --  5
+
+Player: NORTH is making a move ...
+move: 7, took 469s, board after move:
+23  --  1  6  3  3  17  4  1
+4  7  16  1  1  3  3  --  5
+
+Player: SOUTH is making a move ...
+move: 2, took 0s, board after move:
+23  --  1  6  3  3  17  4  2
+4  0  17  2  2  4  4  --  6
+
+Player: NORTH is making a move ...
+move: 7, took 662s, board after move:
+24  --  0  6  3  3  17  4  2
+4  0  17  2  2  4  4  --  6
+
+Player: NORTH is making a move ...
+move: 4, took 508s, board after move:
+29  --  0  7  4  0  17  4  2
+0  0  17  2  2  4  4  --  6
+
+Player: SOUTH is making a move ...
+move: 6, took 0s, board after move:
+29  --  0  7  4  0  17  5  3
+0  0  17  2  2  0  5  --  7
+
+Player: NORTH is making a move ...
+move: 1, took 281s, board after move:
+32  --  0  7  4  0  18  6  0
+0  0  17  0  2  0  5  --  7
+
+Player: SOUTH is making a move ...
+move: 5, took 0s, board after move:
+32  --  0  7  4  0  18  6  0
+0  0  17  0  0  1  6  --  7
+
+Player: NORTH is making a move ...
+move: 2, took 228s, board after move:
+33  --  1  8  5  1  19  0  0
+0  0  17  0  0  1  6  --  7
+
+Player: NORTH is making a move ...
+move: 7, took 254s, board after move:
+34  --  0  8  5  1  19  0  0
+0  0  17  0  0  1  6  --  7
+
+Player: NORTH is making a move ...
+move: 5, took 208s, board after move:
+35  --  1  9  0  1  19  0  0
+1  1  17  0  0  1  6  --  7
+
+Player: SOUTH is making a move ...
+move: 7, took 0s, board after move:
+35  --  1  9  1  2  20  1  1
+1  1  17  0  0  1  0  --  8
+
+Player: NORTH is making a move ...
+move: 3, took 306s, board after move:
+37  --  3  11  3  4  1  2  2
+2  2  18  1  1  2  1  --  8
+
+Player: NORTH is making a move ...
+move: 5, took 363s, board after move:
+38  --  4  12  0  4  1  2  2
+2  2  18  1  1  2  1  --  8
+
+Player: NORTH is making a move ...
+move: 4, took 224s, board after move:
+39  --  5  13  1  0  1  2  2
+2  2  18  1  1  2  1  --  8
+
+Player: NORTH is making a move ...
+move: 6, took 194s, board after move:
+43  --  6  0  1  0  2  3  3
+3  3  19  0  2  3  2  --  8
+
+Player: SOUTH is making a move ...
+move: 3, took 0s, board after move:
+43  --  7  1  2  1  3  4  4
+4  4  1  2  4  5  4  --  9
+
+Player: NORTH is making a move ...
+move: 1, took 225s, board after move:
+43  --  7  1  3  2  4  5  0
+4  4  1  2  4  5  4  --  9
+
+Player: SOUTH is making a move ...
+move: 6, took 0s, board after move:
+43  --  7  1  3  2  5  6  1
+4  4  1  2  4  0  5  --  10
+
+Player: NORTH is making a move ...
+move: 3, took 148s, board after move:
+44  --  8  2  4  3  0  6  1
+4  4  1  2  4  0  5  --  10
+
+Player: NORTH is making a move ...
+move: 6, took 87s, board after move:
+45  --  9  0  4  3  0  6  1
+4  4  1  2  4  0  5  --  10
+
+Player: NORTH is making a move ...
+move: 2, took 48s, board after move:
+46  --  10  1  5  4  1  0  1
+4  4  1  2  4  0  5  --  10
+
+Player: NORTH is making a move ...
+move: 4, took 43s, board after move:
+47  --  11  2  6  0  1  0  1
+4  4  1  2  4  0  5  --  10
+
+Player: NORTH is making a move ...
+move: 6, took 13s, board after move:
+48  --  12  0  6  0  1  0  1
+4  4  1  2  4  0  5  --  10
+
+Player: NORTH is making a move ...
+move: 5, took 1s, board after move:
+49  --  13  1  0  0  1  0  1
+5  5  2  2  4  0  5  --  10
+
+Player: SOUTH is making a move ...
+move: 1, took 0s, board after move:
+49  --  13  1  0  0  1  0  1
+0  6  3  3  5  1  5  --  10
+
+Player: NORTH is making a move ...
+move: 7, took 0s, board after move:
+55  --  0  0  0  0  0  0  0
+0  0  0  0  0  0  0  --  10
+
+Game Finished, winner: NORTH
+Player 1 move times: [1351, 1297, 1096, 1023, 855, 765, 526, 432, 570, 469, 662, 508, 281, 228, 254, 208, 306, 363, 224, 194, 225, 148, 87, 48, 43, 13, 1, 0]
+Player 1 avg move times: 434s
+Player 2 move times: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Player 2 avg move times: 0s
+Total Time taken: 12190s
+
+3.38hrs

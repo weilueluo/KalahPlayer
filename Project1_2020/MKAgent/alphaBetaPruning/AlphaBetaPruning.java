@@ -97,7 +97,7 @@ public class AlphaBetaPruning {
                                                        int optimalMove, int seq, int alpha, int beta, int depth,
                                                        int threadDepth) {
 
-        int processors = Runtime.getRuntime().availableProcessors() - 1;
+        int processors = Math.min(boardAndMoves.size(), Runtime.getRuntime().availableProcessors() - 1);
         ExecutorService executorService = Executors.newFixedThreadPool(processors);
         ExecutorCompletionService<Result> executor = new ExecutorCompletionService<>(executorService);
         List<Future<Result>> results = new ArrayList<>();

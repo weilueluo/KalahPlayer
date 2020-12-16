@@ -1,0 +1,2 @@
+- Multi-Threading
+- Sort all valid moves in alpha beta pruning by heuristic so that we can get pruning more likely
