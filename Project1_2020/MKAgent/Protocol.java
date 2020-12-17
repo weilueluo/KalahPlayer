@@ -24,6 +24,15 @@ public class Protocol {
          * or -1 if the opponent has made a swap.
          */
         public int move;
+
+        @Override
+        public String toString() {
+            return "MoveTurn{" +
+                    "end=" + end +
+                    ", again=" + again +
+                    ", move=" + move +
+                    '}';
+        }
     }
 
     /**

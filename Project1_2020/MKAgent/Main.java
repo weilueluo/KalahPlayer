@@ -4,6 +4,7 @@ import MKAgent.agents.ABPAgent;
 import MKAgent.agents.Agent;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -23,113 +24,99 @@ import static MKAgent.Utils.sendMsg;
  */
 public class Main {
 
-
     /**
      * The main method, invoked when the program is started.
      *
      * @param args Command line arguments.
      */
-
-    // map: first move -> boolean
-    // hard code main
-
-    // time estimate: moves made, board, time -> alpha pruning depth, >= 3
-    // read: requirements & protocol
-    public static void main(String[] args) throws ExecutionException, InterruptedException, IOException, InvalidMessageException {
-        evaluate();
-//        while (true) {
-//            String message = recvMsg();
-//            MsgType type = Protocol.getMessageType(message);
-//            switch (type) {
-//                case START:
-//                    // if our turn: send normal move
-//                    // if their turn, do nothing
-//                case STATE:
-//                    // it is our turn:
-//                    //     state == swap:
-//                    //         send swap or not according to table
-//                    //     state == change:
-//                    //         if have enough time: send alpha pruning result
-//                    //         if do not have enough time: send alpha pruning with less depth result
-//                case END:
-//                    // do nothing
-//                default:
-//                    throw new RuntimeException();
-//            }
-//        }
-    }
-
-    private static Optional<MsgType> getMessageType(String message) {
-        try {
-            return Optional.of(Protocol.getMessageType(message));
-        } catch (InvalidMessageException e) {
-            System.err.println("Cannot infer message type from message: " + e);
-        }
-        return Optional.empty();
-    }
-
-    private static void handleStartMessage(String message) {
-        try {
-            boolean ourStart = Protocol.interpretStartMsg(message);
-            if (ourStart) {
-                sendMsg(Protocol.createMoveMsg(Play.getStartMove()));
-            }  // else do nothing, opponent first move
-        } catch (InvalidMessageException e) {
-            System.err.println("Failed to interpret start message: " + e);
-        }
-    }
-
-    private static void handleStateMessage(String message, long secondsSpent) {
-        Board board = new Board(7, 7);
-        try {
-            Protocol.MoveTurn moveTurn = Protocol.interpretStateMsg(message, board);
-        } catch (InvalidMessageException e) {
-            System.err.println("Failed to interpret state message: " + e);
-        }
-    }
-
-    private static void handleEndMessage(String message) {
-
-    }
-
-    private static void _main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InvalidMessageException {
         boolean gameFinished = false;
         long secondsSpent = 0;
+        Side ourSide = null;
+        boolean isFirstMove = true;
+        PrintWriter writer = new PrintWriter("log.txt", "UTF-8");
         while (!gameFinished) {
+            writer.append("Waiting for message ...\n");
+            writer.flush();
             String message = receiveMessage();
+            writer.append("Received Message: ").append(message);
+            writer.flush();
             // start 1 seconds early, ensure we do not over-estimate time left.
             Instant thisMoveStartTime = Instant.now().minus(1, ChronoUnit.SECONDS);
-            Optional<MsgType> messageType = getMessageType(message);
-            if (messageType.isPresent()) {
-                switch (messageType.get()) {
-                    case START:
-                        handleStartMessage(message);
-                        break;
-                    case STATE:
-                        handleStateMessage(message, secondsSpent);
-                        break;
-                    case END:
-                        handleEndMessage(message);
+            MsgType messageType = Protocol.getMessageType(message);
+            String messageToSend = null;
+            switch (messageType) {
+                case START:
+                    boolean ourStart = Protocol.interpretStartMsg(message);
+                    if (ourStart) {
+                        messageToSend = Protocol.createMoveMsg(Play.getStartMove());
+                        isFirstMove = false;
+                        ourSide = Side.SOUTH;
+                    } else {
+                        ourSide = Side.NORTH;
+                    }
+                    break;
+                case STATE:
+                    // move == -1: enemy swapped
+                    // end == true: game ended
+                    // again == true: make a move
+                    // again == false: do nothing
+                    // first move: make a swap / make a move
+                    Board board = new Board(7, 7);
+                    Protocol.MoveTurn state = Protocol.interpretStateMsg(message, board);
+                    writer.append(board.toString());
+                    writer.append(ourSide.toString()).append("\n");
+                    if (state.end) {
+                        writer.append("state.end\n");
                         gameFinished = true;
-                        break;
-                    default:
-                        System.err.println("Unexpected message type encountered: " + messageType.get());
-                        break;
-                }
+                    } else if (state.move == -1) {
+                        writer.append("state.move == -1\n");
+                        ourSide = ourSide.opposite();
+                        messageToSend = Protocol.createMoveMsg(Play.getMove(board, ourSide, secondsSpent));
+                    } else if (isFirstMove) {
+                        writer.append("isFirstMove\n");
+                        if (Play.getSwap(board)) {
+                            messageToSend = Protocol.createSwapMsg();
+                            ourSide = ourSide.opposite();
+                        } else {
+                            messageToSend = Protocol.createMoveMsg(Play.getMove(board, ourSide, secondsSpent));
+                        }
+                        isFirstMove = false;
+                    } else if (state.again) {
+                        writer.append("state.again\n");
+                        messageToSend = Protocol.createMoveMsg(Play.getMove(board, ourSide, secondsSpent));
+                    } else {
+                        writer.append("none\n");
+                        writer.append(state.toString()).append("\n");
+                    }
+                    break;
+                case END:
+                    gameFinished = true;
+                    break;
+                default:
+                    System.err.println("Unexpected message type encountered: " + messageType);
+                    break;
+            }
+            if (messageToSend != null) {
+                writer.append("Message Sent: ").append(messageToSend);
+                writer.flush();
+                sendMsg(messageToSend);
             }
             // add time spent for this move
             secondsSpent += Duration.between(thisMoveStartTime, Instant.now()).getSeconds();
         }
+        writer.close();
+        System.err.println("Game has ended");
     }
 
     private static void evaluate() {
-        Agent player1 = new ABPAgent(12, 2);
-        Agent player2 = new ABPAgent(12, 2);
+        Agent player1 = new ABPAgent(15, 2);
+        Agent player2 = new ABPAgent(15, 2);
 
         int south_side_win = 0;
         int north_side_win = 0;
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             Board board = new Board(7, 7);
             Kalah game = new Kalah(board);
             boolean gameFinished = false;
@@ -156,8 +143,8 @@ public class Main {
                     player2MoveTimes.add(moveSeconds);
                 }
                 System.err.println(", move: " + move + ", took " + moveSeconds + "s, board:");
-                System.err.println(board);
                 nextPlayer = game.makeMove(Move.of(nextPlayer, move));
+                System.err.println(board);
                 Kalah.State state = game.gameOver();
                 if (state.over) {
                     gameFinished = true;
