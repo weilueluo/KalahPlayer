@@ -3,13 +3,10 @@ package MKAgent.alphaBetaPruning;
 import MKAgent.*;
 import MKAgent.Utils.Tuple;
 
-import java.sql.Array;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AlphaBetaPruning {
@@ -64,10 +61,10 @@ public class AlphaBetaPruning {
 
         if (threadDepth >= 1) {
             return _multiThreadAlphaBetaPruning(boardAndMoves, comparator, order, optimalValue, optimalMove,
-                    seq, alpha, beta, depth, threadDepth);
+                    seq, alpha, beta, depth, threadDepth, side);
         } else {
             return _normalAlphaBetaPruning(boardAndMoves, comparator, order, optimalValue, optimalMove,
-                    seq, alpha, beta, depth, threadDepth);
+                    seq, alpha, beta, depth, threadDepth, side);
         }
     }
 
@@ -75,7 +72,7 @@ public class AlphaBetaPruning {
                                                   BiFunction<Integer, Integer, Boolean> comparator,
                                                   BiFunction<Integer, Integer, Integer> order,
                                                   int optimalValue, int optimalMove, int seq, int alpha, int beta,
-                                                  int depth, int threadDepth) {
+                                                  int depth, int threadDepth, Side side) {
         for (Tuple<Board, Side, Integer> boardSideTuple : boardAndMoves) {
             Result result = alphaBetaPruning(boardSideTuple.getFirst(), boardSideTuple.getSecond(), seq, alpha, beta,
                     depth - 1, threadDepth);
@@ -83,7 +80,11 @@ public class AlphaBetaPruning {
                 optimalValue = result.score;
                 optimalMove = boardSideTuple.getThird();
             }
-            alpha = order.apply(alpha, optimalValue);
+            if (isMaxNode(side)) {
+                alpha = order.apply(alpha, optimalValue);
+            } else {
+                beta = order.apply(beta, optimalValue);
+            }
             if (beta <= alpha) {
                 break;
             }
@@ -95,7 +96,7 @@ public class AlphaBetaPruning {
                                                        BiFunction<Integer, Integer, Boolean> comparator,
                                                        BiFunction<Integer, Integer, Integer> order, int optimalValue,
                                                        int optimalMove, int seq, int alpha, int beta, int depth,
-                                                       int threadDepth) {
+                                                       int threadDepth, Side side) {
 
         int processors = Math.min(boardAndMoves.size(), Runtime.getRuntime().availableProcessors() - 1);
         ExecutorService executorService = Executors.newFixedThreadPool(processors);
@@ -106,29 +107,30 @@ public class AlphaBetaPruning {
             results.add(executor.submit(
                     createAlphaPruningTask(boardAndMoves.get(i), i, alpha, beta, depth, threadDepth)));
         }
-        int resultCount = 0;
-        while (resultCount < boardAndMoves.size()) {
+        for (Future<Result> future : results) {
             try {
-                Result result = executor.take().get();
+                Result result = future.get();
                 if (comparator.apply(result.score, optimalValue)) {
                     optimalValue = result.score;
                     optimalMove = boardAndMoves.get(result.seq).getThird();
                 }
-                alpha = order.apply(alpha, optimalValue);
+                if (isMaxNode(side)) {
+                    alpha = order.apply(alpha, optimalValue);
+                } else {
+                    beta = order.apply(beta, optimalValue);
+                }
                 if (beta <= alpha) {
                     break;
                 }
-            } catch (InterruptedException | ExecutionException ignore) {
+            } catch (InterruptedException | ExecutionException ignored) {
                 // ignore
-            } finally {
-                resultCount++;
             }
         }
         // cancel any remaining tasks
         for (Future<Result> future : results) {
             future.cancel(true);
         }
-        executorService.shutdown();
+        executorService.shutdownNow();
         return Result.of(optimalMove, optimalValue, seq);
     }
 
@@ -137,7 +139,10 @@ public class AlphaBetaPruning {
                 .stream()
                 .map(move -> getNextBoard(board, side, move))
                 // sort by heuristic desc, because it is more likely to be pruned
-                .sorted((tuple1, tuple2) -> getHeuristic(tuple2.getFirst()) - getHeuristic(tuple1.getFirst()))
+                .sorted((tuple1, tuple2) -> {
+                    int heuDiff = getHeuristic(tuple2.getFirst()) - getHeuristic(tuple1.getFirst());
+                    return heuDiff == 0 ? tuple1.getThird() - tuple2.getThird() : heuDiff;
+                })
                 .collect(Collectors.toList());
     }
 
