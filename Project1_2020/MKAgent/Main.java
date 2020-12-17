@@ -137,46 +137,67 @@ public class Main {
 //        Side nextPlayer = Side.values()[new Random().nextInt(Side.values().length)];
         Side nextPlayer = Side.NORTH;
 
-        Agent player1 = new ABPAgent(12, 2);
-        Agent player2 = new ABPAgent(8, 1);
+        Agent player1 = new ABPAgent(10, 2);
+        Agent player2 = new ABPAgent(8, 0);
         Side winner = null;
 
         List<Long> player1MoveTimes = new ArrayList<>();
         List<Long> player2MoveTimes = new ArrayList<>();
         Instant startTime = Instant.now();
+        //Move starting_move = new Move()
         long moveSeconds;
-        while (!gameFinished) {
-            int move;
-            Instant moveStartTime = Instant.now();
-            System.err.println("Player: " + nextPlayer + " is making a move ...");
-            if (nextPlayer == Side.NORTH) {
-                move = player1.getMove(board, Side.NORTH);
-                moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
-                player1MoveTimes.add(moveSeconds);
-            } else {
-                move = player2.getMove(board, Side.SOUTH);
-                moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
-                player2MoveTimes.add(moveSeconds);
-            }
-            System.err.println("move: " + move + ", took " + moveSeconds + "s, board after move:");
-            nextPlayer = game.makeMove(Move.of(nextPlayer, move));
-            System.err.println(board);
-            Kalah.State state = game.gameOver();
-            if (state.over) {
-                gameFinished = true;
-                winner = state.winner;
-            }
+        //game.makeMove(Move.of(Side.SOUTH, 1));
+        int south_side_win = 0;
+        int north_side_win = 0;
+        System.err.println(board);
+        for(int i = 0 ; i < 10 ; i++)
+        {
+            board = new Board(7, 7);
+            game = new Kalah(board);
+            gameFinished = false;
+            winner = null;
+          System.out.println("Game:"+ (i+1));
+          while (!gameFinished) {
+              int move;
+              Instant moveStartTime = Instant.now();
+              //System.err.println("Player: " + nextPlayer + " is making a move ...");
+              if (nextPlayer == Side.NORTH) {
+                  move = player1.getMove(board, Side.NORTH);
+                  moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
+                  player1MoveTimes.add(moveSeconds);
+              } else {
+                  move = player2.getMove(board, Side.SOUTH);
+                  moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
+                  player2MoveTimes.add(moveSeconds);
+              }
+              //System.err.println("move: " + move + ", took " + moveSeconds + "s, board after move:");
+              nextPlayer = game.makeMove(Move.of(nextPlayer, move));
+              //System.err.println(board);
+              Kalah.State state = game.gameOver();
+              if (state.over) {
+                  gameFinished = true;
+                  winner = state.winner;
+              }
+          }
+            System.out.println("winner" + winner);
+            System.out.println(board);
+          if(winner == Side.NORTH)
+            north_side_win++;
+          if(winner == Side.SOUTH)
+            south_side_win++;
         }
-        System.err.println("Game Finished, winner: " + winner);
-        System.err.println("Player 1 move times: " + Arrays.toString(player1MoveTimes.toArray()));
-        long player1AvgMoveTime = (long) player1MoveTimes.stream().mapToLong(i -> i).average().orElse(0);
-        System.err.println("Player 1 avg move times: " + player1AvgMoveTime + "s");
-
-        System.err.println("Player 2 move times: " + Arrays.toString(player2MoveTimes.toArray()));
-        long player2AvgMoveTime = (long) player2MoveTimes.stream().mapToLong(i -> i).average().orElse(0);
-        System.err.println("Player 2 avg move times: " + player2AvgMoveTime + "s");
-
-        System.err.println("Total Time taken: " + Duration.between(startTime, Instant.now()).getSeconds() + "s");
+        System.err.println("North:" + north_side_win);
+        System.err.println("South:" + south_side_win);
+        // System.err.println("Game Finished, winner: " + winner);
+        // System.err.println("Player 1 move times: " + Arrays.toString(player1MoveTimes.toArray()));
+        // long player1AvgMoveTime = (long) player1MoveTimes.stream().mapToLong(i -> i).average().orElse(0);
+        // System.err.println("Player 1 avg move times: " + player1AvgMoveTime + "s");
+        //
+        // System.err.println("Player 2 move times: " + Arrays.toString(player2MoveTimes.toArray()));
+        // long player2AvgMoveTime = (long) player2MoveTimes.stream().mapToLong(i -> i).average().orElse(0);
+        // System.err.println("Player 2 avg move times: " + player2AvgMoveTime + "s");
+        //
+        // System.err.println("Total Time taken: " + Duration.between(startTime, Instant.now()).getSeconds() + "s");
     }
 
 
