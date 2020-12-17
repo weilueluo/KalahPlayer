@@ -25,6 +25,15 @@ public class AlphaBetaPruning {
         private static Result of(int move, int score, int seq) {
             return new Result(move, score, seq);
         }
+
+        @Override
+        public String toString() {
+            return "Result{" +
+                    "move=" + move +
+                    ", score=" + score +
+                    ", seq=" + seq +
+                    '}';
+        }
     }
 
     public static boolean isMaxNode(Side side) {
@@ -98,14 +107,13 @@ public class AlphaBetaPruning {
                                                        int optimalMove, int seq, int alpha, int beta, int depth,
                                                        int threadDepth, Side side) {
 
-        int processors = Math.min(boardAndMoves.size(), Runtime.getRuntime().availableProcessors() - 1);
-        ExecutorService executorService = Executors.newFixedThreadPool(processors);
+        ExecutorService executorService = Executors.newFixedThreadPool(boardAndMoves.size());
         ExecutorCompletionService<Result> executor = new ExecutorCompletionService<>(executorService);
         List<Future<Result>> results = new ArrayList<>();
 
         for (int i = 0; i < boardAndMoves.size(); i++) {
-            results.add(executor.submit(
-                    createAlphaPruningTask(boardAndMoves.get(i), i, alpha, beta, depth, threadDepth)));
+            results.add(executor.submit(createAlphaPruningTask(
+                    boardAndMoves.get(i), i, alpha, beta, depth, threadDepth)));
         }
         for (Future<Result> future : results) {
             try {
