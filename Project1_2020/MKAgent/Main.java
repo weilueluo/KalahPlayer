@@ -123,8 +123,8 @@ public class Main {
     }
 
     private static void evaluate() {
-        Agent player1 = new ABPAgent(15, 2);
-        Agent player2 = new ABPAgent(15, 2);
+        Agent player1 = new ABPAgent(12, 2);
+        Agent player2 = new ABPAgent(12, 2);
 
         int south_side_win = 0;
         int north_side_win = 0;
@@ -145,6 +145,7 @@ public class Main {
             while (!gameFinished) {
                 int move;
                 Instant moveStartTime = Instant.now();
+                System.err.print("Player " + nextPlayer + " is making a move... ");
                 if (nextPlayer == Side.NORTH) {
                     move = player1.getMove(board, Side.NORTH);
                     moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
@@ -154,8 +155,8 @@ public class Main {
                     moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
                     player2MoveTimes.add(moveSeconds);
                 }
-
-                System.err.println("side: " + nextPlayer + ", move: " + move + ", took " + moveSeconds + "s");
+                System.err.println(", move: " + move + ", took " + moveSeconds + "s, board:");
+                System.err.println(board);
                 nextPlayer = game.makeMove(Move.of(nextPlayer, move));
                 Kalah.State state = game.gameOver();
                 if (state.over) {
