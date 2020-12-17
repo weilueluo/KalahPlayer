@@ -53,46 +53,32 @@ public class AlphaBetaPruning {
         if (depth == 0 || isTerminal(board)) {
             return Result.of(-1, getHeuristic(board), seq);
         }
-        BiFunction<Integer, Integer, Integer> order;
-        BiFunction<Integer, Integer, Boolean> comparator;
-        int optimalValue;
-        if (isMaxNode(side)) {
-            optimalValue = Integer.MIN_VALUE;
-            order = Math::max;
-            comparator = (a, b) -> a > b;
-        } else {
-            optimalValue = Integer.MAX_VALUE;
-            order = Math::min;
-            comparator = (a, b) -> a < b;
-        }
+        int optimalValue = isMaxNode(side) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
         int optimalMove = -1;
         List<Tuple<Board, Side, Integer>> boardAndMoves = getAllPossibleNextBoards(board, side);
-
         if (threadDepth >= 1) {
-            return _multiThreadAlphaBetaPruning(boardAndMoves, comparator, order, optimalValue, optimalMove,
-                    seq, alpha, beta, depth, threadDepth, side);
+            return _multiThreadAlphaBetaPruning(boardAndMoves, optimalValue, optimalMove, seq, alpha, beta, depth,
+                    threadDepth, side);
         } else {
-            return _normalAlphaBetaPruning(boardAndMoves, comparator, order, optimalValue, optimalMove,
-                    seq, alpha, beta, depth, threadDepth, side);
+            return _normalAlphaBetaPruning(boardAndMoves, optimalValue, optimalMove, seq, alpha, beta, depth,
+                    threadDepth, side);
         }
     }
 
     private static Result _normalAlphaBetaPruning(List<Tuple<Board, Side, Integer>> boardAndMoves,
-                                                  BiFunction<Integer, Integer, Boolean> comparator,
-                                                  BiFunction<Integer, Integer, Integer> order,
                                                   int optimalValue, int optimalMove, int seq, int alpha, int beta,
                                                   int depth, int threadDepth, Side side) {
         for (Tuple<Board, Side, Integer> boardSideTuple : boardAndMoves) {
             Result result = alphaBetaPruning(boardSideTuple.getFirst(), boardSideTuple.getSecond(), seq, alpha, beta,
                     depth - 1, threadDepth);
-            if (comparator.apply(result.score, optimalValue)) {
+            if (isMaxNode(side) && result.score > optimalValue) {
                 optimalValue = result.score;
                 optimalMove = boardSideTuple.getThird();
-            }
-            if (isMaxNode(side)) {
-                alpha = order.apply(alpha, optimalValue);
-            } else {
-                beta = order.apply(beta, optimalValue);
+                alpha = Math.max(alpha, optimalValue);
+            } else if (!isMaxNode(side) && result.score < optimalValue) {
+                optimalValue = result.score;
+                optimalMove = boardSideTuple.getThird();
+                beta = Math.min(beta, optimalValue);
             }
             if (beta <= alpha) {
                 break;
@@ -102,10 +88,8 @@ public class AlphaBetaPruning {
     }
 
     private static Result _multiThreadAlphaBetaPruning(List<Tuple<Board, Side, Integer>> boardAndMoves,
-                                                       BiFunction<Integer, Integer, Boolean> comparator,
-                                                       BiFunction<Integer, Integer, Integer> order, int optimalValue,
-                                                       int optimalMove, int seq, int alpha, int beta, int depth,
-                                                       int threadDepth, Side side) {
+                                                       int optimalValue, int optimalMove, int seq, int alpha, int beta,
+                                                       int depth, int threadDepth, Side side) {
 
         ExecutorService executorService = Executors.newFixedThreadPool(boardAndMoves.size());
         ExecutorCompletionService<Result> executor = new ExecutorCompletionService<>(executorService);
@@ -118,14 +102,14 @@ public class AlphaBetaPruning {
         for (Future<Result> future : results) {
             try {
                 Result result = future.get();
-                if (comparator.apply(result.score, optimalValue)) {
+                if (isMaxNode(side) && result.score > optimalValue) {
                     optimalValue = result.score;
                     optimalMove = boardAndMoves.get(result.seq).getThird();
-                }
-                if (isMaxNode(side)) {
-                    alpha = order.apply(alpha, optimalValue);
-                } else {
-                    beta = order.apply(beta, optimalValue);
+                    alpha = Math.max(alpha, optimalValue);
+                } else if (!isMaxNode(side) && result.score < optimalValue) {
+                    optimalValue = result.score;
+                    optimalMove = boardAndMoves.get(result.seq).getThird();
+                    beta = Math.min(beta, optimalValue);
                 }
                 if (beta <= alpha) {
                     break;
