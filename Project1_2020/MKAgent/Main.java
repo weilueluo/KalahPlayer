@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -133,13 +135,31 @@ public class Main {
             Side winner = null;
             Side nextPlayer = Side.NORTH;
             System.err.println("Game: " + (i + 1));
+
+            List<Long> player1MoveTimes = new ArrayList<>();
+            List<Long> player2MoveTimes = new ArrayList<>();
+            Instant startTime = Instant.now();
+            long moveSeconds;
+
             while (!gameFinished) {
                 int move;
+
+                Instant moveStartTime = Instant.now();
+
                 if (nextPlayer == Side.NORTH) {
                     move = player1.getMove(board, Side.NORTH);
+
+                    moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
+                    player1MoveTimes.add(moveSeconds);
                 } else {
                     move = player2.getMove(board, Side.SOUTH);
+
+                    moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
+                    player2MoveTimes.add(moveSeconds);
                 }
+
+                System.err.println("move: " + move + ", took " + moveSeconds + "s, board after move:");
+
                 nextPlayer = game.makeMove(Move.of(nextPlayer, move));
                 Kalah.State state = game.gameOver();
                 if (state.over) {
