@@ -26,7 +26,6 @@ public class Protocol {
         public int move;
     }
 
-
     /**
      * Creates a "move" message.
      *
@@ -166,4 +165,3 @@ public class Protocol {
         return moveTurn;
     }
 }
-
