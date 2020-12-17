@@ -123,13 +123,13 @@ public class Main {
     }
 
     private static void evaluate() {
-        Agent player1 = new ABPAgent(12, 2);
-        Agent player2 = new ABPAgent(12, 2);
+        Agent player1 = new ABPAgent(14, 2);
+        Agent player2 = new ABPAgent(14, 2);
 
         int south_side_win = 0;
         int north_side_win = 0;
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             Board board = new Board(7, 7);
             Kalah game = new Kalah(board);
             boolean gameFinished = false;
@@ -141,7 +141,8 @@ public class Main {
             List<Long> player2MoveTimes = new ArrayList<>();
             Instant startTime = Instant.now();
             long moveSeconds;
-
+            game.makeMove(Move.of(Side.SOUTH, 1));
+            System.err.println(board);
             while (!gameFinished) {
                 int move;
                 Instant moveStartTime = Instant.now();
@@ -156,8 +157,8 @@ public class Main {
                     player2MoveTimes.add(moveSeconds);
                 }
                 System.err.println(", move: " + move + ", took " + moveSeconds + "s, board:");
-                System.err.println(board);
                 nextPlayer = game.makeMove(Move.of(nextPlayer, move));
+                System.err.println(board);
                 Kalah.State state = game.gameOver();
                 if (state.over) {
                     gameFinished = true;
