@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -122,8 +123,8 @@ public class Main {
     }
 
     private static void evaluate() {
-        Agent player1 = new ABPAgent(8, 2);
-        Agent player2 = new ABPAgent(8, 0);
+        Agent player1 = new ABPAgent(15, 2);
+        Agent player2 = new ABPAgent(15, 2);
 
         int south_side_win = 0;
         int north_side_win = 0;
@@ -143,23 +144,18 @@ public class Main {
 
             while (!gameFinished) {
                 int move;
-
                 Instant moveStartTime = Instant.now();
-
                 if (nextPlayer == Side.NORTH) {
                     move = player1.getMove(board, Side.NORTH);
-
                     moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
                     player1MoveTimes.add(moveSeconds);
                 } else {
                     move = player2.getMove(board, Side.SOUTH);
-
                     moveSeconds = Duration.between(moveStartTime, Instant.now()).getSeconds();
                     player2MoveTimes.add(moveSeconds);
                 }
 
-                System.err.println("move: " + move + ", took " + moveSeconds + "s, board after move:");
-
+                System.err.println("side: " + nextPlayer + ", move: " + move + ", took " + moveSeconds + "s");
                 nextPlayer = game.makeMove(Move.of(nextPlayer, move));
                 Kalah.State state = game.gameOver();
                 if (state.over) {
@@ -168,6 +164,10 @@ public class Main {
                 }
             }
             System.err.println("winner: " + winner);
+            System.err.println("player 1 times: " + Arrays.toString(player1MoveTimes.toArray()));
+            System.err.println("player 2 times: " + Arrays.toString(player2MoveTimes.toArray()));
+            System.err.println("Match Time Taken: " + Duration.between(startTime, Instant.now()).getSeconds());
+            System.err.println(board);
             if (winner == Side.NORTH)
                 north_side_win++;
             if (winner == Side.SOUTH)
