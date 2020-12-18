@@ -1,15 +1,21 @@
 package MKAgent.alphaBetaPruning;
 
-import MKAgent.*;
+import MKAgent.Board;
+import MKAgent.Kalah;
+import MKAgent.Move;
+import MKAgent.Side;
 import MKAgent.Utils.Tuple;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
-import java.util.function.BiFunction;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-public class AlphaBetaPruning {
+public class AlphaBetaPruningCopy {
 
     public static class Result {
         public final int move;
@@ -142,10 +148,10 @@ public class AlphaBetaPruning {
     private static Tuple<Board, Side, Integer> getNextBoard(Board board, Side side, int move) {
         Board boardCopy = board.uncheckedClone();
         Side nextPlayer = Kalah.makeMove(boardCopy, Move.of(side, move));
-        return Utils.Tuple.of(boardCopy, nextPlayer, move);
+        return Tuple.of(boardCopy, nextPlayer, move);
     }
 
-    private static Callable<Result> createAlphaPruningTask(Utils.Tuple<Board, Side, Integer> tuple, int seq, int alpha,
+    private static Callable<Result> createAlphaPruningTask(Tuple<Board, Side, Integer> tuple, int seq, int alpha,
                                                            int beta, int depth, int threadDepth) {
         Board boardCopy = tuple.getFirst();
         Side nextPlayer = tuple.getSecond();

@@ -1,6 +1,7 @@
 package MKAgent;
 
 import MKAgent.agents.ABPAgent;
+import MKAgent.agents.ABPAgentCopy;
 import MKAgent.agents.Agent;
 
 import java.io.IOException;
@@ -30,6 +31,11 @@ public class Main {
      * @param args Command line arguments.
      */
     public static void main(String[] args) throws IOException, InvalidMessageException {
+//        evaluate();
+        tournament();
+    }
+
+    public static void tournament() throws IOException, InvalidMessageException {
         boolean gameFinished = false;
         long secondsSpent = 0;
         Side ourSide = null;
@@ -110,8 +116,8 @@ public class Main {
     }
 
     private static void evaluate() {
-        Agent player1 = new ABPAgent(15, 2);
-        Agent player2 = new ABPAgent(15, 2);
+        Agent player1 = new ABPAgentCopy(14, 2);
+        Agent player2 = new ABPAgent(14, 2);
 
         int south_side_win = 0;
         int north_side_win = 0;
