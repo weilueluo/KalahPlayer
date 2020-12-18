@@ -34,13 +34,13 @@ public class Main {
         long secondsSpent = 0;
         Side ourSide = null;
         boolean isFirstMove = true;
-        PrintWriter writer = new PrintWriter("log.txt", "UTF-8");
+//        PrintWriter writer = new PrintWriter("log.txt", "UTF-8");
         while (!gameFinished) {
-            writer.append("Waiting for message ...\n");
-            writer.flush();
+//            writer.append("Waiting for message ...\n");
+//            writer.flush();
             String message = receiveMessage();
-            writer.append("Received Message: ").append(message);
-            writer.flush();
+//            writer.append("Received Message: ").append(message);
+//            writer.flush();
             // start 1 seconds early, ensure we do not over-estimate time left.
             Instant thisMoveStartTime = Instant.now().minus(1, ChronoUnit.SECONDS);
             MsgType messageType = Protocol.getMessageType(message);
@@ -64,18 +64,18 @@ public class Main {
                     // first move: make a swap / make a move
                     Board board = new Board(7, 7);
                     Protocol.MoveTurn state = Protocol.interpretStateMsg(message, board);
-                    writer.append(board.toString());
-                    writer.append(ourSide.toString()).append("\n");
+//                    writer.append(board.toString());
+//                    writer.append(ourSide.toString()).append("\n");
                     if (state.end) {
-                        writer.append("state.end\n");
+//                        writer.append("state.end\n");
                         gameFinished = true;
                     } else if (state.move == -1) {
-                        writer.append("state.move == -1\n");
+//                        writer.append("state.move == -1\n");
                         ourSide = ourSide.opposite();
                         messageToSend = Protocol.createMoveMsg(Play.getMove(board, ourSide, secondsSpent));
                     } else if (isFirstMove) {
-                        writer.append("isFirstMove\n");
-                        if (Play.getSwap(board)) {
+//                        writer.append("isFirstMove\n");
+                        if (Play.getSwap(state.move)) {
                             messageToSend = Protocol.createSwapMsg();
                             ourSide = ourSide.opposite();
                         } else {
@@ -83,12 +83,12 @@ public class Main {
                         }
                         isFirstMove = false;
                     } else if (state.again) {
-                        writer.append("state.again\n");
+//                        writer.append("state.again\n");
                         messageToSend = Protocol.createMoveMsg(Play.getMove(board, ourSide, secondsSpent));
-                    } else {
-                        writer.append("none\n");
-                        writer.append(state.toString()).append("\n");
-                    }
+                    } // else {
+//                        writer.append("none\n");
+//                        writer.append(state.toString()).append("\n");
+//                    }
                     break;
                 case END:
                     gameFinished = true;
@@ -98,14 +98,14 @@ public class Main {
                     break;
             }
             if (messageToSend != null) {
-                writer.append("Message Sent: ").append(messageToSend);
-                writer.flush();
+//                writer.append("Message Sent: ").append(messageToSend);
+//                writer.flush();
                 sendMsg(messageToSend);
             }
             // add time spent for this move
             secondsSpent += Duration.between(thisMoveStartTime, Instant.now()).getSeconds();
         }
-        writer.close();
+//        writer.close();
         System.err.println("Game has ended");
     }
 

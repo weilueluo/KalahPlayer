@@ -7,11 +7,10 @@ import java.util.Random;
 public class Play {
 
     public static int getStartMove() {
-        // TODO
-        return 1;
+        return 7;
     }
 
-    private static final ABPAgent player = new ABPAgent(8, 2);
+    private static final ABPAgent player = new ABPAgent(14, 2);
 
     public static int getMove(Board board, Side side, long secondsSpent) {
         if (Kalah.gameOver(board).over) {
@@ -21,9 +20,7 @@ public class Play {
         return player.getMove(board, side);
     }
 
-    public static boolean getSwap(Board board) {
-        // TODO
-        return true;
+    public static boolean getSwap(int oppMove) {
+        return oppMove != 1 && oppMove != 2 && oppMove != 6;
     }
-
 }
