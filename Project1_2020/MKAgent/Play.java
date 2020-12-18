@@ -7,7 +7,7 @@ import java.util.Random;
 public class Play {
 
     public static int getStartMove() {
-        return 7;
+        return 4;
     }
 
     private static final ABPAgent player = new ABPAgent(14, 2);
